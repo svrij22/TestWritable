@@ -50,11 +50,32 @@ namespace TestWritable
 
             w.MouseWheel += new MouseWheelEventHandler(w_MouseWheel);
 
+            w.KeyDown += W_KeyDown;
+
             Application app = new Application();
-            scene = new Scene(writeableBitmap, (int)w.Width, (int)w.Height);
+            scene = new Scene(writeableBitmap, w.Width, w.Height);
             app.Run();
         }
 
+        private static void W_KeyDown(object sender, KeyEventArgs e)
+        {
+            const float Speed = 0.1f;
+
+            switch (e.Key)
+            {
+                case Key.A:
+                    // Move left
+                    scene.Origin = new Vector3(scene.Origin.X - Speed, 0, 0);
+                    break;
+                case Key.D:
+                    // Move right
+                    scene.Origin = new Vector3(scene.Origin.X + Speed, 0, 0);
+                    break;
+            }
+
+            // Assuming you have a Render method to redraw the scene
+            scene.Draw();
+        }
 
         static void i_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {

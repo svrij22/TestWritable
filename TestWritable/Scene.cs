@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
@@ -13,12 +14,12 @@ namespace TestWritable
     internal class Scene
     {
         private WriteableBitmap writeableBitmap;
-        private readonly int width;
-        private readonly int height;
+        private readonly double width;
+        private readonly double height;
 
         public List<TracerObject> TracerObjects { get; set; } = new();
         public Vector3 Origin { get; set; }
-        public Scene(WriteableBitmap writeableBitmap, int Width, int Height)
+        public Scene(WriteableBitmap writeableBitmap, double Width, double Height)
         {
             this.writeableBitmap = writeableBitmap;
 
@@ -26,14 +27,17 @@ namespace TestWritable
             height = Height;
 
             //Create scene
-            //var sphere1 = new Sphere(new Vector3(-1, 0, -3), 0.5f, Color.Red);
-            //TracerObjects.Add(sphere1);
+            var sphere1 = new Sphere(new Vector3(-1.5f, 0, -2), 0.5f, Color.Red);
+            TracerObjects.Add(sphere1);
 
-            var sphere2 = new Sphere(new Vector3(0, 0, -1), 0.5f, Color.Blue);
+            var sphere2 = new Sphere(new Vector3(0, 0, -3), 0.5f, Color.Blue);
             TracerObjects.Add(sphere2);
 
-            //var sphere3 = new Sphere(new Vector3(1, 0, -3), 0.5f, Color.Green);
-            //TracerObjects.Add(sphere3);
+            var sphere3 = new Sphere(new Vector3(1.5f, 0, -2), 0.5f, Color.Green);
+            TracerObjects.Add(sphere3);
+
+            //TracerObject floor = new Plane(new Vector3(0, -3, 0), -1, Color.FromArgb(255, 127, 127, 127)); // Assuming up is along y axis
+            //TracerObjects.Add(floor);
 
             Origin = new Vector3(0, 0, 0);
         }
@@ -44,8 +48,6 @@ namespace TestWritable
         {
             try
             {
-                // Reserve the back buffer for updates.
-                writeableBitmap.Lock();
 
                 // Settins
                 var aspectRatio = width / (float)height;
@@ -58,45 +60,66 @@ namespace TestWritable
                 var vertical = new Vector3(0, viewportHeight, 0);
                 var lowerLeftCorner = Origin - horizontal / 2 - vertical / 2 - new Vector3(0, 0, focalLength);
 
-                // All pixels
-                for (int col = 0; col < width; col++)
+                // Create a 2D array to hold color data
+                int[,] colorData = new int[(int)width, (int)height];
+                List<Task> tasks = new List<Task>();
+
+                int taskCount = 12;
+                int rowsPerTask = (int)(height / taskCount);
+
+                for (int taskNumber = 0; taskNumber < taskCount; taskNumber++)
                 {
-                    for (int row = 0; row < height; row++)
+                    // Determine the start and end rows for this task
+                    int startRow = taskNumber * rowsPerTask;
+                    int endRow = (int)(taskNumber == taskCount - 1 
+                        ? height : 
+                        startRow + rowsPerTask); // Make sure the last task handles any remaining rows
+
+                    tasks.Add(Task.Run(() =>
                     {
-                        unsafe
+                        for (int col = 0; col < width; col++)
                         {
-                            //
-                            // Pointer stuff
-                            //
-                            // Get a pointer to the back buffer.
-                            IntPtr pBackBuffer = writeableBitmap.BackBuffer;
+                            for (int row = startRow; row < endRow; row++)
+                            {
+                                float u = (float)(col / (width - 1));
+                                float v = (float)(row / (height - 1));
 
-                            // Find the address of the pixel to draw.
-                            pBackBuffer += row * writeableBitmap.BackBufferStride;
-                            pBackBuffer += col * 4;
+                                // Pointing each ray towards a point on the viewport
+                                var direction = lowerLeftCorner + Ext.MultiplyVectorByScalar(horizontal, u) + Ext.MultiplyVectorByScalar(vertical, v) - Origin;
+                                var ray = new Ray(Origin, Vector3.Normalize(direction));
 
-                            //
-                            // Ray tracing
-                            // 
+                                // Get color
+                                int color_data = Tracer.Trace(ray, TracerObjects);
 
-                            float u = (float)(col / (width - 1));
-                            float v = (float)(row / (height - 1));
-
-                            // Pointing each ray towards a point on the viewport
-                            var direction = lowerLeftCorner + Ext.MultiplyVectorByScalar(horizontal, u) + Ext.MultiplyVectorByScalar(vertical, v) - Origin;
-                            var ray = new Ray(Origin, Vector3.Normalize(direction));
-
-                            // Get color
-                            int color_data = Tracer.Trace(ray, TracerObjects);
-
-                            // Assign the color data to the pixel.
-                            *((int*)pBackBuffer) = color_data;
+                                // set col in arr
+                                colorData[col, row] = color_data;
+                            }
                         }
+                    }));
+                }
 
-                        // Specify the area of the bitmap that changed.
-                        writeableBitmap.AddDirtyRect(new Int32Rect(col, row, 1, 1));
+                // Wait for all tasks to complete
+                Task.WaitAll(tasks.ToArray());
+
+                // Reserve the back buffer for updates.
+                writeableBitmap.Lock();
+
+                // Convert 2D array to 1D because WritePixels takes a 1D array
+                int[] flatArray = new int[(int)(width * height)];
+                for (int i = 0; i < height; i++)
+                {
+                    for (int j = 0; j < width; j++)
+                    {
+                        flatArray[(int)(i * width + j)] = colorData[j, i];
                     }
                 }
+
+                // Create an Int32Rect with the size of the whole bitmap
+                Int32Rect rect = new Int32Rect(0, 0, (int)width, (int)height);
+
+                // Write the 1D array of color data to the bitmap
+                writeableBitmap.WritePixels(rect, flatArray, (int)width * 4, 0);
+
             }
             finally
             {
