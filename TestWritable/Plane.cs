@@ -10,25 +10,33 @@ namespace TestWritable
 {
     public class Plane : TracerObject
     {
-        public Vector3 Normal { get; set; }
-        public float Offset { get; set; }
-        public Color color { get; set; }
-
-        public Plane(Vector3 normal, float offset, Color color)
+        public Vector3 Normal { get; private set; }
+        public Plane(Vector3 center, Vector3 normal, Color color)
         {
-            Normal = normal;
-            Offset = offset;
-            this.color = color;
+            this.Center = center;
+            this.Normal = Vector3.Normalize(normal);
+            this.Color = color;
+        }
+
+        public override Vector3 NormalAt(Vector3 point)
+        {
+            return Normal; // Plane's normal is constant everywhere
         }
 
         public override bool Hit(Ray r, float tMin, float tMax, out float t)
         {
             float denom = Vector3.Dot(Normal, r.Direction);
-            if (Math.Abs(denom) > 0.0001f) // Avoid division by zero
+            if (MathF.Abs(denom) > 1e-6) // Ensure we're not dividing by zero (or close to it)
             {
-                t = (Offset - Vector3.Dot(Normal, r.Origin)) / denom;
-                return t >= tMin && t <= tMax;
+                Vector3 oc = Center - r.Origin;
+                t = Vector3.Dot(oc, Normal) / denom;
+
+                if (t < tMax && t > tMin)
+                {
+                    return true;
+                }
             }
+
             t = 0;
             return false;
         }

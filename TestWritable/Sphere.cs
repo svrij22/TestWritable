@@ -15,9 +15,33 @@ namespace TestWritable
         {
             this.Center = center;
             this.Radius = radius;
-            this.color = color;
+            this.Color = color;
         }
 
+        /// <summary>
+        /// Returns the normal for any given point in space
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public override Vector3 NormalAt(Vector3 point)
+        {
+            Vector3 normalVector = Vector3.Subtract(point, Center);
+            normalVector = Vector3.Normalize(normalVector);
+            return normalVector;
+        }
+
+        /// <summary>
+        /// The Hit method in the Sphere class is used to check if a ray intersects the sphere between tMin and tMax. 
+        /// It calculates the quadratic equation's coefficients to represent intersection points. Using the quadratic formula,
+        /// it finds the discriminant and determines the number of solutions. If the discriminant is > 0, there are two intersections. 
+        /// For each, it verifies if the t value lies within tMin and tMax. If so, t is set to this value and true is returned. 
+        /// Otherwise, t is set to 0 and false is returned, indicating no intersection.
+        /// </summary>
+        /// <param name="r"></param>
+        /// <param name="tMin"></param>
+        /// <param name="tMax"></param>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public override bool Hit(Ray r, float tMin, float tMax, out float t)
         {
             var oc = r.Origin - Center;

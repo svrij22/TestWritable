@@ -36,10 +36,40 @@ namespace TestWritable
             var sphere3 = new Sphere(new Vector3(1.5f, 0, -2), 0.5f, Color.Green);
             TracerObjects.Add(sphere3);
 
-            //TracerObject floor = new Plane(new Vector3(0, -3, 0), -1, Color.FromArgb(255, 127, 127, 127)); // Assuming up is along y axis
-            //TracerObjects.Add(floor);
+            TracerObject floor = new Plane(new Vector3(0, 1, 0), new Vector3(0, -1, 0), Color.Gray); // Assuming up is along y axis
+            TracerObjects.Add(floor);
 
             Origin = new Vector3(0, 0, 0);
+        }
+
+        /// <summary>
+        /// View settings
+        /// </summary>
+        public double AspectRatio => width / (float)height;
+        public float ViewportHeight = 2.0f;
+        public double ViewportWidth => AspectRatio * ViewportHeight;
+        public float FocalLength = 1.0f;
+        public Vector3 horizontal => new Vector3((float)ViewportWidth, 0, 0);
+        public Vector3 vertical => new Vector3(0, ViewportHeight, 0);
+        public Vector3 lowerLeftCorner => Origin - horizontal / 2 - vertical / 2 - new Vector3(0, 0, FocalLength);
+
+        /// <summary>
+        /// Trace single point
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="row"></param>
+        internal void TracePoint(int column, int row)
+        {
+            //get u and v
+            float u = (float)(column / (width - 1));
+            float v = (float)(row / (height - 1));
+
+            // Pointing each ray towards a point on the viewport
+            var direction = lowerLeftCorner + Ext.MultiplyVectorByScalar(horizontal, u) + Ext.MultiplyVectorByScalar(vertical, v) - Origin;
+            var ray = new Ray(Origin, Vector3.Normalize(direction));
+
+            // Get color
+            int color_data = RayTracer.Trace(ray, TracerObjects);
         }
 
         // The DrawPixel method updates the WriteableBitmap by using
@@ -48,17 +78,6 @@ namespace TestWritable
         {
             try
             {
-
-                // Settins
-                var aspectRatio = width / (float)height;
-                var viewportHeight = 2.0f;
-                var viewportWidth = aspectRatio * viewportHeight;
-                var focalLength = 1.0f;
-
-                // Top left corner of the viewport
-                var horizontal = new Vector3((float)viewportWidth, 0, 0);
-                var vertical = new Vector3(0, viewportHeight, 0);
-                var lowerLeftCorner = Origin - horizontal / 2 - vertical / 2 - new Vector3(0, 0, focalLength);
 
                 // Create a 2D array to hold color data
                 int[,] colorData = new int[(int)width, (int)height];
@@ -81,6 +100,7 @@ namespace TestWritable
                         {
                             for (int row = startRow; row < endRow; row++)
                             {
+                                //get u and v
                                 float u = (float)(col / (width - 1));
                                 float v = (float)(row / (height - 1));
 
@@ -89,7 +109,7 @@ namespace TestWritable
                                 var ray = new Ray(Origin, Vector3.Normalize(direction));
 
                                 // Get color
-                                int color_data = Tracer.Trace(ray, TracerObjects);
+                                int color_data = RayTracer.Trace(ray, TracerObjects);
 
                                 // set col in arr
                                 colorData[col, row] = color_data;

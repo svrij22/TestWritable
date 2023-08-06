@@ -10,8 +10,11 @@ namespace TestWritable
 {
     public abstract class TracerObject
     {
+        public double Luminance { get; set; }
         public Vector3 Center { get; set; }
-        public Color color { get; set; }
-        public abstract bool Hit(Ray r, float tMin, float tMax, out float t);
+        public Color Color { get; set; }
+
+        public abstract Vector3 NormalAt(Vector3 point);
+        public abstract bool Hit(Ray r, float tMin, float tMax, out float dist);
     }
 }

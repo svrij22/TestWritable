@@ -47,6 +47,8 @@ namespace TestWritable
 
             i.MouseRightButtonDown +=
                 new MouseButtonEventHandler(i_MouseRightButtonDown);
+            i.MouseLeftButtonDown +=
+                new MouseButtonEventHandler(i_MouseLeftButtonDown);
 
             w.MouseWheel += new MouseWheelEventHandler(w_MouseWheel);
 
@@ -80,6 +82,13 @@ namespace TestWritable
         static void i_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             scene.Draw();
+        }
+
+        static void i_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            int column = (int)e.GetPosition(i).X;
+            int row = (int)e.GetPosition(i).Y;
+            scene.TracePoint(column, row);
         }
 
         static void w_MouseWheel(object sender, MouseWheelEventArgs e)
