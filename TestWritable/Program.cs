@@ -26,8 +26,8 @@ namespace TestWritable
             RenderOptions.SetEdgeMode(i, EdgeMode.Aliased);
 
             w = new Window();
-            w.Height = 1080;
-            w.Width = 1600;
+            w.Height = 560;
+            w.Width = 960;
             w.Content = i;
             w.Show();
 
@@ -56,6 +56,7 @@ namespace TestWritable
 
             Application app = new Application();
             scene = new Scene(writeableBitmap, w.Width, w.Height);
+            scene.Draw();
             app.Run();
         }
 
@@ -67,11 +68,19 @@ namespace TestWritable
             {
                 case Key.A:
                     // Move left
-                    scene.Origin = new Vector3(scene.Origin.X - Speed, 0, 0);
+                    scene.Origin = new Vector3(scene.Origin.X - Speed,    scene.Origin.Y,          scene.Origin.Z);
                     break;
                 case Key.D:
                     // Move right
-                    scene.Origin = new Vector3(scene.Origin.X + Speed, 0, 0);
+                    scene.Origin = new Vector3(scene.Origin.X + Speed,    scene.Origin.Y,          scene.Origin.Z);
+                    break;
+                case Key.W:
+                    // Move left
+                    scene.Origin = new Vector3(scene.Origin.X,            scene.Origin.Y ,         scene.Origin.Z - Speed);
+                    break;
+                case Key.S:
+                    // Move right
+                    scene.Origin = new Vector3(scene.Origin.X,            scene.Origin.Y ,         scene.Origin.Z + Speed);
                     break;
             }
 

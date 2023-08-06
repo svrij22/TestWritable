@@ -26,23 +26,43 @@ namespace TestWritable
             width = Width;
             height = Height;
 
-            //Create scene
+            //SPHERE 1
             var sphere1 = new Sphere(new Vector3(-1.5f, 0, -2), 0.5f, Color.Red, .1f, .95f);
             TracerObjects.Add(sphere1);
 
+            //SPHERE 2
             var sphere2 = new Sphere(new Vector3(0, 0, -3), 0.5f, Color.Blue, .1f, .55f);
             TracerObjects.Add(sphere2);
 
+            //SPHERE 3
+            var sphere3 = new Sphere(new Vector3(1.5f, 0, -2), 0.5f, Color.Green, .1f, .01f);
+            TracerObjects.Add(sphere3);
+
+            //SPHERE BEHIND
             var sphere2_behind = new Sphere(new Vector3(0, 0, -5), 0.5f, Color.Orange, .1f, .55f);
             TracerObjects.Add(sphere2_behind);
 
-            var sphere3 = new Sphere(new Vector3(1.5f, 0, -2), 0.5f, Color.Green, .1f, .05f);
-            TracerObjects.Add(sphere3);
+            //RED 1
+            var rectangle3 = new Rectangle(new Vector3(-4, 0, -5), new Vector3(-2, -2, -5), Color.Black, .1f, .2f);
+            TracerObjects.Add(rectangle3);
 
+            //BLUE 1
+            var rectangle4 = new Rectangle(new Vector3(-2, 0, -5), new Vector3(0, -2, -5), Color.White, .1f, .2f);
+            TracerObjects.Add(rectangle4);
+
+            //RED 1
+            var rectangle = new Rectangle(new Vector3(0, 0, -5), new Vector3(2, -2, -5), Color.Black, .1f, .2f);
+            TracerObjects.Add(rectangle);
+
+            //BLUE 1
+            var rectangle2 = new Rectangle(new Vector3(2, 0, -5), new Vector3(4, -2, -5), Color.White, .1f, .2f);
+            TracerObjects.Add(rectangle2);
+
+            //LIGHT SOURCE
             var light_source = new Sphere(new Vector3(0, -3, -2), 0.9f, Color.White, 1);
             TracerObjects.Add(light_source);
 
-            TracerObject floor = new Plane(new Vector3(0, .5f, 0), new Vector3(0, -1, 0), Color.Gray, luminance: .5f, reflectivity: .04f); // Assuming up is along y axis
+            TracerObject floor = new Plane(new Vector3(0, .5f, 0), new Vector3(0, -1, 0), Color.WhiteSmoke, luminance: .5f, reflectivity: .04f); // Assuming up is along y axis
             TracerObjects.Add(floor);
 
             Origin = new Vector3(0, 0, 0);
@@ -89,7 +109,7 @@ namespace TestWritable
                 int[,] colorData = new int[(int)width, (int)height];
                 List<Task> tasks = new List<Task>();
 
-                int taskCount = 12;
+                int taskCount = 24;
                 int rowsPerTask = (int)(height / taskCount);
 
                 for (int taskNumber = 0; taskNumber < taskCount; taskNumber++)
