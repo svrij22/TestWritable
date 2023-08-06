@@ -31,9 +31,9 @@ namespace TestWritable
             if (hitObject != null)
             {
                 //Get color
-                var red = (int)(hitObject.Color.R);
-                var green = (int)(hitObject.Color.G);
-                var blue = (int)(hitObject.Color.B);
+                var red = (int)(hitObject.Color.R * hitObject.Luminance);
+                var green = (int)(hitObject.Color.G * hitObject.Luminance);
+                var blue = (int)(hitObject.Color.B * hitObject.Luminance);
                 var directColor = Ext.RGBToColorInt(red, green, blue);
                 
                 return directColor;

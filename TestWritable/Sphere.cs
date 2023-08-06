@@ -11,11 +11,12 @@ namespace TestWritable
     public class Sphere : TracerObject
     {
         public float Radius { get; private set; }
-        public Sphere(Vector3 center, float radius, Color color)
+        public Sphere(Vector3 center, float radius, Color color, double luminance = 1d)
         {
             this.Center = center;
             this.Radius = radius;
             this.Color = color;
+            this.Luminance = luminance;
         }
 
         /// <summary>

@@ -11,11 +11,12 @@ namespace TestWritable
     public class Plane : TracerObject
     {
         public Vector3 Normal { get; private set; }
-        public Plane(Vector3 center, Vector3 normal, Color color)
+        public Plane(Vector3 center, Vector3 normal, Color color, double luminance = 1d)
         {
             this.Center = center;
             this.Normal = Vector3.Normalize(normal);
             this.Color = color;
+            this.Luminance = luminance;
         }
 
         public override Vector3 NormalAt(Vector3 point)

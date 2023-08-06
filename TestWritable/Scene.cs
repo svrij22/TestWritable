@@ -27,16 +27,19 @@ namespace TestWritable
             height = Height;
 
             //Create scene
-            var sphere1 = new Sphere(new Vector3(-1.5f, 0, -2), 0.5f, Color.Red);
+            var sphere1 = new Sphere(new Vector3(-1.5f, 0, -2), 0.5f, Color.Red, .3d);
             TracerObjects.Add(sphere1);
 
-            var sphere2 = new Sphere(new Vector3(0, 0, -3), 0.5f, Color.Blue);
+            var sphere2 = new Sphere(new Vector3(0, 0, -3), 0.5f, Color.Blue, .3d);
             TracerObjects.Add(sphere2);
 
-            var sphere3 = new Sphere(new Vector3(1.5f, 0, -2), 0.5f, Color.Green);
+            var light_source = new Sphere(new Vector3(0, -2, -2), 0.5f, Color.White, 1);
+            TracerObjects.Add(light_source);
+
+            var sphere3 = new Sphere(new Vector3(1.5f, 0, -2), 0.5f, Color.Green, .3d);
             TracerObjects.Add(sphere3);
 
-            TracerObject floor = new Plane(new Vector3(0, 1, 0), new Vector3(0, -1, 0), Color.Gray); // Assuming up is along y axis
+            TracerObject floor = new Plane(new Vector3(0, 1, 0), new Vector3(0, -1, 0), Color.Gray, luminance: .5d); // Assuming up is along y axis
             TracerObjects.Add(floor);
 
             Origin = new Vector3(0, 0, 0);
