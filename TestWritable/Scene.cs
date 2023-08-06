@@ -27,19 +27,22 @@ namespace TestWritable
             height = Height;
 
             //Create scene
-            var sphere1 = new Sphere(new Vector3(-1.5f, 0, -2), 0.5f, Color.Red, .3d);
+            var sphere1 = new Sphere(new Vector3(-1.5f, 0, -2), 0.5f, Color.Red, .1f, .95f);
             TracerObjects.Add(sphere1);
 
-            var sphere2 = new Sphere(new Vector3(0, 0, -3), 0.5f, Color.Blue, .3d);
+            var sphere2 = new Sphere(new Vector3(0, 0, -3), 0.5f, Color.Blue, .1f, .55f);
             TracerObjects.Add(sphere2);
 
-            var light_source = new Sphere(new Vector3(0, -2, -2), 0.5f, Color.White, 1);
-            TracerObjects.Add(light_source);
+            var sphere2_behind = new Sphere(new Vector3(0, 0, -5), 0.5f, Color.Orange, .1f, .55f);
+            TracerObjects.Add(sphere2_behind);
 
-            var sphere3 = new Sphere(new Vector3(1.5f, 0, -2), 0.5f, Color.Green, .3d);
+            var sphere3 = new Sphere(new Vector3(1.5f, 0, -2), 0.5f, Color.Green, .1f, .05f);
             TracerObjects.Add(sphere3);
 
-            TracerObject floor = new Plane(new Vector3(0, 1, 0), new Vector3(0, -1, 0), Color.Gray, luminance: .5d); // Assuming up is along y axis
+            var light_source = new Sphere(new Vector3(0, -3, -2), 0.9f, Color.White, 1);
+            TracerObjects.Add(light_source);
+
+            TracerObject floor = new Plane(new Vector3(0, .5f, 0), new Vector3(0, -1, 0), Color.Gray, luminance: .5f, reflectivity: .04f); // Assuming up is along y axis
             TracerObjects.Add(floor);
 
             Origin = new Vector3(0, 0, 0);

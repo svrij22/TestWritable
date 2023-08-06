@@ -10,7 +10,8 @@ namespace TestWritable
 {
     public abstract class TracerObject
     {
-        public double Luminance { get; set; }
+        public float Luminance { get; set; } = 1f;
+        public float Reflectivity { get; set; } = 0f;
         public Vector3 Center { get; set; }
         public Color Color { get; set; }
 
