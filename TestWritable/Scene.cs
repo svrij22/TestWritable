@@ -31,7 +31,7 @@ namespace TestWritable
             TracerObjects.Add(sphere1);
 
             //SPHERE 2
-            var sphere2 = new Sphere(new Vector3(0, 0, -3), 0.5f, Color.Blue,                               .1f, .55f, 1f);
+            var sphere2 = new Sphere(new Vector3(0, 0, -3), 0.5f, Color.Pink,                               .1f, .2f, 1f);
             TracerObjects.Add(sphere2);
 
             //SPHERE 3
@@ -42,6 +42,14 @@ namespace TestWritable
             var sphere2_behind = new Sphere(new Vector3(2f, 0, -5), 0.5f, Color.Orange,                     .1f, .55f, 1f);
             TracerObjects.Add(sphere2_behind);
 
+
+            //SIDE
+            var side1 = new Rectangle(new Vector3(-6, 0, -5), new Vector3(-6, -2, 0), Color.DarkRed, .3f, 0);
+            TracerObjects.Add(side1);
+
+            //SIDE 2
+            var side2 = new Rectangle(new Vector3(6, 0, -5), new Vector3(6, -2, 0), Color.CadetBlue, .3f, 0);
+            TracerObjects.Add(side2);
 
             //BLUE 1
             var rectangle11 = new Rectangle(new Vector3(-6, 0, -5), new Vector3(-4, -2, -5), Color.White, .1f, .2f);
@@ -71,7 +79,7 @@ namespace TestWritable
             var light_source = new Sphere(new Vector3(0, -3, -2), 0.9f, Color.White, 1);
             TracerObjects.Add(light_source);
 
-            TracerObject floor = new Plane(new Vector3(0, .5f, 0), new Vector3(0, -1, 0), Color.WhiteSmoke, luminance: .5f, reflectivity: .04f); // Assuming up is along y axis
+            TracerObject floor = new Plane(new Vector3(0, .5f, 0), new Vector3(0, -1, 0), Color.WhiteSmoke, luminance: .2f, reflectivity: .04f, fresnel: .2f); // Assuming up is along y axis
             TracerObjects.Add(floor);
 
             Origin = new Vector3(0, 0, 0);
