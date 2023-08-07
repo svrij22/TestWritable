@@ -42,6 +42,11 @@ namespace TestWritable
             var sphere2_behind = new Sphere(new Vector3(2f, 0, -5), 0.5f, Color.Orange,                     .1f, .55f, 1f);
             TracerObjects.Add(sphere2_behind);
 
+
+            //BLUE 1
+            var rectangle11 = new Rectangle(new Vector3(-6, 0, -5), new Vector3(-4, -2, -5), Color.White, .1f, .2f);
+            TracerObjects.Add(rectangle11);
+
             //RED 1
             var rectangle3 = new Rectangle(new Vector3(-4, 0, -5), new Vector3(-2, -2, -5), Color.Black,    .1f, .2f);
             TracerObjects.Add(rectangle3);
@@ -57,6 +62,10 @@ namespace TestWritable
             //BLUE 1
             var rectangle2 = new Rectangle(new Vector3(2, 0, -5), new Vector3(4, -2, -5), Color.White,      .1f, .2f);
             TracerObjects.Add(rectangle2);
+
+            //RED 1
+            var rectangle22 = new Rectangle(new Vector3(4, 0, -5), new Vector3(6, -2, -5), Color.Black, .1f, .2f);
+            TracerObjects.Add(rectangle22);
 
             //LIGHT SOURCE
             var light_source = new Sphere(new Vector3(0, -3, -2), 0.9f, Color.White, 1);
