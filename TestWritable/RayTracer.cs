@@ -42,11 +42,14 @@ namespace TestWritable
                     Vector3 normal = hitObject.NormalAt(hitPoint, ray);
                     Vector3 offsetPos = hitPoint + normal * 0.01f;  // Offset point along the normal
 
-                    float ior = 1.5f; // Replace with the refractive index of the material
+                    //index of refraction
+                    float ior = 1.3f; // Replace with the refractive index of the material
 
                     // For glass materials
-                    if (hitObject.Material == MaterialType.Glass)
+                    /*if (hitObject.Material == MaterialType.Glass)
                     {
+
+                        //Create rays and check if can refract
                         Ray refractedRay, reflectedRay;
                         Vector3 refractedDirection, reflectedDirection = Vector3.Reflect(ray.Direction, normal);
                         bool canRefract = Refract(ray.Direction, normal, (Vector3.Dot(normal, ray.Direction) > 0) ? ior : 1 / ior, out refractedDirection);
@@ -73,6 +76,38 @@ namespace TestWritable
                             reflectedRay = new Ray(offsetPos, reflectedDirection);
                             return Trace(reflectedRay, objects, depth + 1);
                         }
+                    }*/
+
+                    // For glass materials
+                    if (hitObject.Material == MaterialType.Glass)
+                    {
+
+                        Vector3 outwardNormal;
+                        Vector3 reflected = Vector3.Reflect(ray.Direction, hitObject.NormalAt(hitPoint, ray));
+                        float ni_over_nt;
+                        float reflectProb;
+                        Vector3 refracted;
+                        if (Vector3.Dot(ray.Direction, normal) > 0)
+                        {
+                            outwardNormal = -normal;
+                            ni_over_nt = ior;  // ior is the refractive index for the material
+                            reflectProb = FresnelReflection(ray.Direction, normal, ior);
+                        }
+                        else
+                        {
+                            outwardNormal = normal;
+                            ni_over_nt = 1.0f / ior;
+                            reflectProb = FresnelReflection(ray.Direction, -normal, ior);
+                        }
+
+                        Refract(ray.Direction, outwardNormal, ni_over_nt, out refracted);
+                        Ray refractedRay = new Ray(hitPoint, refracted);
+                        var refractCol = Trace(refractedRay, objects, depth + 1);
+
+                        Ray reflectedRay = new Ray(hitPoint, reflected);
+                        var reflectCol = Trace(reflectedRay, objects, depth + 1);
+
+                        return Ext.MixColors(refractCol, reflectCol, 1-reflectProb);
                     }
 
                     // Fresnel reflection coefficient
