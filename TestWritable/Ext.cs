@@ -67,5 +67,21 @@ namespace TestWritable
             int resultColor = (red << 16) | (green << 8) | blue;
             return resultColor;
         }
+
+        public static float GetIntensity(int color)
+        {
+            // Extract the individual color components (R, G, B)
+            int red = (color >> 16) & 0xFF;
+            int green = (color >> 8) & 0xFF;
+            int blue = color & 0xFF;
+
+            // Calculate the intensity using the luminance formula
+            float intensity = 0.299f * red + 0.587f * green + 0.114f * blue;
+
+            // Normalize to the range [0, 1]
+            intensity /= 255.0f;
+
+            return intensity;
+        }
     }
 }

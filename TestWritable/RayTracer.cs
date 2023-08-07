@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Media3D;
 using static System.Windows.Forms.DataFormats;
 using static TestWritable.TracerObject;
 
@@ -193,18 +194,26 @@ namespace TestWritable
         public static Random random = new Random();
         private static int GetDiffuseColour(TracerObject hitObject, List<TracerObject> objects, Vector3 hitPoint, Vector3 normal)
         {
+            
+            //Base light intensity is ambient light
             var diffuseLightIntensity = hitObject.Luminance; //Ambient
 
-            foreach (var light in objects.Where(obj => obj.Luminance > .2f)) // Consider objects with Luminance > 0 as light sources
+            //For each luminant object
+            var luminant_objects = objects.Where(obj => obj.Luminance > .2f);
+            foreach (var light in luminant_objects) // Consider objects with Luminance > 0 as light sources
             {
+                
+                //Cast 8 rays
                 int numSoftShadowRays = 8;
                 int numShadowHits = 0;
                 for (int i = 0; i < numSoftShadowRays; i++)
                 {
+                    //Point to random object on light
                     Vector3 randomPointOnLight = light.GetRandomPoint(); // Assuming your TracerObject can provide a random point on its surface
                     Vector3 lightDir = Vector3.Normalize(randomPointOnLight - hitPoint);
                     Ray shadowRay = new Ray(hitPoint, lightDir);
 
+                    //Check if ray is in shadow
                     bool inShadow = false;
                     foreach (var o in objects)
                     {
@@ -217,16 +226,16 @@ namespace TestWritable
                         }
                     }
 
+                    //Shadow hits
                     if (inShadow)
-                    {
                         numShadowHits++;
-                    }
 
                     //Skip if x times consequetively zero
                     if (numShadowHits == 0 && i == (numSoftShadowRays/2))
                         i = numSoftShadowRays;
                 }
 
+                //Calculate shadow factor
                 float shadowFactor = 1.0f - (float)numShadowHits / numSoftShadowRays;
                 diffuseLightIntensity += light.Luminance * shadowFactor * Math.Max(0, Vector3.Dot(Vector3.Normalize(light.Center - hitPoint), normal));
             }
