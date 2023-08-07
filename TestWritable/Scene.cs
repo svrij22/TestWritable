@@ -87,9 +87,8 @@ namespace TestWritable
             TracerObjects.Add(rectangle22);
 
 
-
             //LIGHT SOURCE
-            var light_source = new Sphere(new Vector3(0, -3, -2), 0.9f, Color.White, 1);
+            var light_source = new Sphere(new Vector3(0, -3, -2), 1f, Color.White, 1);
             TracerObjects.Add(light_source);
 
             TracerObject floor = new Plane(new Vector3(0, .5f, 0), new Vector3(0, -1, 0), Color.WhiteSmoke, luminance: .2f, reflectivity: .04f, fresnel: .2f); // Assuming up is along y axis

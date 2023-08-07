@@ -43,40 +43,7 @@ namespace TestWritable
                     Vector3 offsetPos = hitPoint + normal * 0.01f;  // Offset point along the normal
 
                     //index of refraction
-                    float ior = 1.3f; // Replace with the refractive index of the material
-
-                    // For glass materials
-                    /*if (hitObject.Material == MaterialType.Glass)
-                    {
-
-                        //Create rays and check if can refract
-                        Ray refractedRay, reflectedRay;
-                        Vector3 refractedDirection, reflectedDirection = Vector3.Reflect(ray.Direction, normal);
-                        bool canRefract = Refract(ray.Direction, normal, (Vector3.Dot(normal, ray.Direction) > 0) ? ior : 1 / ior, out refractedDirection);
-
-                        // If we can refract, use a mix of reflection and refraction based on the Fresnel effect.
-                        // If not, we have total internal reflection.
-                        if (canRefract)
-                        {
-                            float reflectionWeight = FresnelReflection(ray.Direction, normal, ior);
-                            float refractionWeight = 1 - reflectionWeight;
-
-                            reflectedRay = new Ray(offsetPos, reflectedDirection);
-                            refractedRay = new Ray(offsetPos, refractedDirection);
-
-                            // Blend the two colors based on Fresnel effect. This pseudo-code assumes that your colors are in some blendable format.
-                            var reflectedColor = Trace(reflectedRay, objects, depth + 1);
-                            var refractedColor = Trace(refractedRay, objects, depth + 1);
-
-                            // Blend your colors based on the Fresnel weights:
-                            return Ext.MixColors(refractedColor, reflectedColor, refractionWeight);
-                        }
-                        else
-                        {
-                            reflectedRay = new Ray(offsetPos, reflectedDirection);
-                            return Trace(reflectedRay, objects, depth + 1);
-                        }
-                    }*/
+                    float ior = 1.2f; // Replace with the refractive index of the material
 
                     // For glass materials
                     if (hitObject.Material == MaterialType.Glass)
@@ -99,6 +66,11 @@ namespace TestWritable
                             ni_over_nt = 1.0f / ior;
                             reflectProb = FresnelReflection(ray.Direction, -normal, ior);
                         }
+                        static float Lerp(float a, float b, float t)
+                        {
+                            return (1 - t) * a + t * b;
+                        }
+                        reflectProb = Lerp(reflectProb, 0.5f, 0.1f);
 
                         Refract(ray.Direction, outwardNormal, ni_over_nt, out refracted);
                         Ray refractedRay = new Ray(hitPoint, refracted);
@@ -146,7 +118,7 @@ namespace TestWritable
             }
 
             // Return black if no hit
-            return Ext.RGBToColorInt(12, 12, 12);
+            return Ext.RGBToColorInt(120, 150, 180);
         }
 
         /// <summary>
