@@ -204,7 +204,7 @@ namespace TestWritable
             {
                 
                 //Cast 8 rays
-                int numSoftShadowRays = 8;
+                int numSoftShadowRays = 30;
                 int numShadowHits = 0;
                 for (int i = 0; i < numSoftShadowRays; i++)
                 {
