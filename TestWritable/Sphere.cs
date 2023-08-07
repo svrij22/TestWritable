@@ -10,14 +10,15 @@ namespace TestWritable
 {
     public class Sphere : TracerObject
     {
-        public float Radius { get; private set; }
-        public Sphere(Vector3 center, float radius, Color color, float luminance = 1f, float reflectivity = 0f)
+        public Sphere(Vector3 center, float radius, Color color, float luminance = 1f, float reflectivity = 0f, float fresnel = 0f)
         {
             this.Center = center;
             this.Radius = radius;
             this.Color = color;
+
             this.Luminance = luminance;
             this.Reflectivity = reflectivity;
+            this.Fresnel = fresnel;
         }
 
         /// <summary>

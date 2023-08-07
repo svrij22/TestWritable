@@ -46,5 +46,26 @@ namespace TestWritable
             // Construct the mixed color
             return (255 << 24) | (mixedR << 16) | (mixedG << 8) | mixedB;
         }
+        public static int MultiplyColor(int color, float factor)
+        {
+            // Extract the individual color components (R, G, B)
+            int red = (color >> 16) & 0xFF;
+            int green = (color >> 8) & 0xFF;
+            int blue = color & 0xFF;
+
+            // Multiply each color component by the factor
+            red = (int)(red * factor);
+            green = (int)(green * factor);
+            blue = (int)(blue * factor);
+
+            // Clamp the color values to the range [0, 255]
+            red = Math.Max(0, Math.Min(255, red));
+            green = Math.Max(0, Math.Min(255, green));
+            blue = Math.Max(0, Math.Min(255, blue));
+
+            // Combine the color components and return the resulting color
+            int resultColor = (red << 16) | (green << 8) | blue;
+            return resultColor;
+        }
     }
 }

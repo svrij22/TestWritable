@@ -27,35 +27,35 @@ namespace TestWritable
             height = Height;
 
             //SPHERE 1
-            var sphere1 = new Sphere(new Vector3(-1.5f, 0, -2), 0.5f, Color.Red, .1f, .95f);
+            var sphere1 = new Sphere(new Vector3(-1.5f, 0, -2), 0.5f, Color.Red,                            .1f, .95f, 1f);
             TracerObjects.Add(sphere1);
 
             //SPHERE 2
-            var sphere2 = new Sphere(new Vector3(0, 0, -3), 0.5f, Color.Blue, .1f, .55f);
+            var sphere2 = new Sphere(new Vector3(0, 0, -3), 0.5f, Color.Blue,                               .1f, .55f, 1f);
             TracerObjects.Add(sphere2);
 
             //SPHERE 3
-            var sphere3 = new Sphere(new Vector3(1.5f, 0, -2), 0.5f, Color.Green, .1f, .01f);
+            var sphere3 = new Sphere(new Vector3(1.5f, 0, -2), 0.5f, Color.Green,                           .1f, .01f, 1f);
             TracerObjects.Add(sphere3);
 
             //SPHERE BEHIND
-            var sphere2_behind = new Sphere(new Vector3(0, 0, -5), 0.5f, Color.Orange, .1f, .55f);
+            var sphere2_behind = new Sphere(new Vector3(2f, 0, -5), 0.5f, Color.Orange,                     .1f, .55f, 1f);
             TracerObjects.Add(sphere2_behind);
 
             //RED 1
-            var rectangle3 = new Rectangle(new Vector3(-4, 0, -5), new Vector3(-2, -2, -5), Color.Black, .1f, .2f);
+            var rectangle3 = new Rectangle(new Vector3(-4, 0, -5), new Vector3(-2, -2, -5), Color.Black,    .1f, .2f);
             TracerObjects.Add(rectangle3);
 
             //BLUE 1
-            var rectangle4 = new Rectangle(new Vector3(-2, 0, -5), new Vector3(0, -2, -5), Color.White, .1f, .2f);
+            var rectangle4 = new Rectangle(new Vector3(-2, 0, -5), new Vector3(0, -2, -5), Color.White,     .1f, .2f);
             TracerObjects.Add(rectangle4);
 
             //RED 1
-            var rectangle = new Rectangle(new Vector3(0, 0, -5), new Vector3(2, -2, -5), Color.Black, .1f, .2f);
+            var rectangle = new Rectangle(new Vector3(0, 0, -5), new Vector3(2, -2, -5), Color.Black,       .1f, .2f);
             TracerObjects.Add(rectangle);
 
             //BLUE 1
-            var rectangle2 = new Rectangle(new Vector3(2, 0, -5), new Vector3(4, -2, -5), Color.White, .1f, .2f);
+            var rectangle2 = new Rectangle(new Vector3(2, 0, -5), new Vector3(4, -2, -5), Color.White,      .1f, .2f);
             TracerObjects.Add(rectangle2);
 
             //LIGHT SOURCE

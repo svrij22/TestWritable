@@ -14,15 +14,17 @@ namespace TestWritable
         public Vector3 Pos2 { get; private set; }
         public Vector3 Normal { get; private set; }
 
-        public Rectangle(Vector3 pos1, Vector3 pos2, Color color, float luminance = 1f, float reflectivity = 0f)
+        public Rectangle(Vector3 pos1, Vector3 pos2, Color color, float luminance = 1f, float reflectivity = 0f, float fresnel = 0f)
         {
             this.Pos1 = pos1;
             this.Pos2 = pos2;
             this.Center = (pos1 + pos2) / 2;
             this.Normal = Vector3.Normalize(Vector3.Cross(pos2 - pos1, new Vector3(0, 1, 0))); // Assumes the rectangle is axis-aligned
             this.Color = color;
+
             this.Luminance = luminance;
             this.Reflectivity = reflectivity;
+            this.Fresnel = fresnel;
         }
 
         public override Vector3 NormalAt(Vector3 point)

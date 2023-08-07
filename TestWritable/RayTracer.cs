@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Windows.Forms.DataFormats;
 
 namespace TestWritable
 {
@@ -12,7 +13,7 @@ namespace TestWritable
     {
         public static int Trace(Ray ray, List<TracerObject> objects, int depth = 0)
         {
-            const int MAX_DEPTH = 4;
+            const int MAX_DEPTH = 2;
 
             //Gets the closest object
             float closest = float.MaxValue;
@@ -36,6 +37,14 @@ namespace TestWritable
                 Vector3 hitPoint = ray.PointAtParameter(closest);
                 Vector3 normal = hitObject.NormalAt(hitPoint);
 
+                // Fresnel reflection coefficient
+                float ior = 1.5f; // Replace with the refractive index of the material
+                float reflectionCoefficient = 0f;
+                if (hitObject.Fresnel > 0)
+                    reflectionCoefficient = FresnelReflection(ray.Direction, normal, ior) * hitObject.Fresnel;
+                reflectionCoefficient += hitObject.Reflectivity;
+                reflectionCoefficient = Math.Clamp(reflectionCoefficient, 0, 1);
+
                 // Depth tracing for bounced rays
                 if (depth < MAX_DEPTH)
                 {
@@ -49,7 +58,7 @@ namespace TestWritable
                     var diffuseColour = GetDiffuseColour(hitObject, objects, hitPoint, normal);
 
                     // Mix the colours
-                    var mixedColour = Ext.MixColors(bounceColour, diffuseColour, hitObject.Reflectivity);
+                    var mixedColour = Ext.MixColors(bounceColour, diffuseColour, reflectionCoefficient);
 
                     // Return mixed colour
                     return mixedColour;
@@ -68,34 +77,39 @@ namespace TestWritable
             }
 
             // Return black if no hit
-            return Ext.RGBToColorInt(173, 216, 230);
+            return Ext.RGBToColorInt(12, 12, 12);
         }
 
-        /// <summary>
-        /// Calculates the angle between 2 rays
-        /// </summary>
-        /// <param name="r1"></param>
-        /// <param name="r2"></param>
-        /// <returns></returns>
-        public static double CalculateAngleBetweenRays(Ray r1, Ray r2)
+        private static float FresnelReflection(Vector3 incidentDirection, Vector3 normal, float ior)
         {
-            // Calculate the dot product
-            float dotProduct = Vector3.Dot(r1.Direction, r2.Direction);
+            float cosI = Math.Max(-1.0f, Math.Min(1.0f, Vector3.Dot(incidentDirection, normal)));
+            float etaI = 1.0f; // Air's refractive index (approximately 1.0)
+            float etaT = ior; // Material's refractive index
 
-            // Get the magnitudes of the rays
-            float magnitudeR1 = r1.Direction.Length();
-            float magnitudeR2 = r2.Direction.Length();
+            if (cosI > 0)
+            {
+                // Outside the material, flip the indices of refraction
+                float temp = etaI;
+                etaI = etaT;
+                etaT = temp;
+            }
 
-            // Calculate the cosine of the angle
-            float cosTheta = dotProduct / (magnitudeR1 * magnitudeR2);
+            // Compute the sine of the transmitted angle using Snell's law
+            float sinT = etaI / etaT * (float)Math.Sqrt(Math.Max(0.0f, 1.0f - cosI * cosI));
 
-            // Use the arccos function to find the angle in radians
-            double angleInRadians = Math.Acos(cosTheta);
-
-            // Convert to degrees
-            double angleInDegrees = angleInRadians * (180.0 / Math.PI);
-
-            return angleInDegrees;
+            // Check for total internal reflection
+            if (sinT >= 1.0f)
+            {
+                return 1.0f; // Total internal reflection, all light is reflected
+            }
+            else
+            {
+                float cosT = (float)Math.Sqrt(Math.Max(0.0f, 1.0f - sinT * sinT));
+                cosI = Math.Abs(cosI);
+                float Rs = ((etaT * cosI) - (etaI * cosT)) / ((etaT * cosI) + (etaI * cosT));
+                float Rp = ((etaI * cosI) - (etaT * cosT)) / ((etaI * cosI) + (etaT * cosT));
+                return (Rs * Rs + Rp * Rp) / 2.0f; // Average reflection coefficient
+            }
         }
 
         /// <summary>
@@ -106,39 +120,48 @@ namespace TestWritable
         /// <param name="hitPoint"></param>
         /// <param name="normal"></param>
         /// <returns></returns>
+
+        public static Random random = new Random();
         private static int GetDiffuseColour(TracerObject hitObject, List<TracerObject> objects, Vector3 hitPoint, Vector3 normal)
         {
             var diffuseLightIntensity = hitObject.Luminance; //Ambient
 
             foreach (var light in objects.Where(obj => obj.Luminance > .2f)) // Consider objects with Luminance > 0 as light sources
             {
-                //Get light dir
-                Vector3 lightDir = Vector3.Normalize(light.Center - hitPoint);
-
-                // Check for shadows
-                // Check if this light source is blocked by any other object
-                Ray shadowRay = new Ray(hitPoint, lightDir);
-                bool inShadow = false;
-                foreach (var o in objects)
+                int numSoftShadowRays = 16;
+                int numShadowHits = 0;
+                for (int i = 0; i < numSoftShadowRays; i++)
                 {
-                    if (o != hitObject && o != light && o.Hit(shadowRay, 0.001f, 1.0f, out _))
+                    Vector3 randomPointOnLight = light.GetRandomPoint(); // Assuming your TracerObject can provide a random point on its surface
+                    Vector3 lightDir = Vector3.Normalize(randomPointOnLight - hitPoint);
+                    Ray shadowRay = new Ray(hitPoint, lightDir);
+
+                    bool inShadow = false;
+                    foreach (var o in objects)
                     {
-                        inShadow = true;
-                        break;
+                        if (o != hitObject && o != light && o.Hit(shadowRay, 0.001f, 1.0f, out _))
+                        {
+                            inShadow = true;
+                            break;
+                        }
                     }
+
+                    if (inShadow)
+                    {
+                        numShadowHits++;
+                    }
+
+                    //Skip if 5 times consequetively zero
+                    if (numShadowHits == 0 && i == 6)
+                        i = numSoftShadowRays;
                 }
 
-                if (!inShadow)
-                {
-                    // Add contribution of this light source to the diffuse light intensity
-                    diffuseLightIntensity += light.Luminance * Math.Max(0, Vector3.Dot(lightDir, normal));
-                }
+                float shadowFactor = 1.0f - (float)numShadowHits / numSoftShadowRays;
+                diffuseLightIntensity += light.Luminance * shadowFactor * Math.Max(0, Vector3.Dot(Vector3.Normalize(light.Center - hitPoint), normal));
             }
 
-            // Clamp diffuseLightIntensity
             diffuseLightIntensity = Math.Clamp(diffuseLightIntensity, 0, 1);
 
-            // Scale the object's colour by the total diffuse light intensity
             var red = (int)(hitObject.Color.R * diffuseLightIntensity);
             var green = (int)(hitObject.Color.G * diffuseLightIntensity);
             var blue = (int)(hitObject.Color.B * diffuseLightIntensity);
