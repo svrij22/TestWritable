@@ -26,7 +26,8 @@ namespace TestWritable
         /// </summary>
         /// <param name="point"></param>
         /// <returns></returns>
-        public override Vector3 NormalAt(Vector3 point)
+        /// <param name="r"></param>
+        public override Vector3 NormalAt(Vector3 point, Ray r)
         {
             Vector3 normalVector = Vector3.Subtract(point, Center);
             normalVector = Vector3.Normalize(normalVector);

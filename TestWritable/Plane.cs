@@ -22,7 +22,7 @@ namespace TestWritable
             this.Fresnel = fresnel;
         }
 
-        public override Vector3 NormalAt(Vector3 point)
+        public override Vector3 NormalAt(Vector3 point, Ray r)
         {
             return Normal; // Plane's normal is constant everywhere
         }

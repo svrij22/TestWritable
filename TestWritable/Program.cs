@@ -62,7 +62,7 @@ namespace TestWritable
 
         private static void W_KeyDown(object sender, KeyEventArgs e)
         {
-            const float Speed = 0.4f;
+            const float Speed = 1.3f;
 
             switch (e.Key)
             {

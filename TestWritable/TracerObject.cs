@@ -17,7 +17,16 @@ namespace TestWritable
         public Vector3 Center { get; set; }
         public Color Color { get; set; }
 
-        public abstract Vector3 NormalAt(Vector3 point);
+        public enum MaterialType
+        {
+            Lambertian,
+            Glass
+        }
+
+        public MaterialType Material { get; set; } = MaterialType.Lambertian;
+
+
+        public abstract Vector3 NormalAt(Vector3 point, Ray r);
         public abstract bool Hit(Ray r, float tMin, float tMax, out float dist);
 
         /// <summary>
