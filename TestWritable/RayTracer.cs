@@ -42,7 +42,7 @@ namespace TestWritable
                     Vector3 normal = hitObject.NormalAt(hitPoint, ray);
 
                     //index of refraction
-                    float ior = 1.2f; // Replace with the refractive index of the material
+                    float ior = 1.5f; // Replace with the refractive index of the material
 
                     // For glass materials
                     if (hitObject.Material == MaterialType.Glass)

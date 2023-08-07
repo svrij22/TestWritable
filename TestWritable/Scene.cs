@@ -32,7 +32,7 @@ namespace TestWritable
         public void LoadScene1()
         {
             //SPHERE 1
-            var sphere1 = new Sphere(new Vector3(-1.5f, 0, -2), 0.5f, Color.White, .1f, 1f, 1f);
+            var sphere1 = new Sphere(new Vector3(-1.5f, 0, -2), 0.5f, Color.WhiteSmoke, .1f, .97f, 1f);
             TracerObjects.Add(sphere1);
 
             //SPHERE 2
@@ -91,7 +91,7 @@ namespace TestWritable
             var light_source = new Sphere(new Vector3(0, -3, -2), 1f, Color.White, 1);
             TracerObjects.Add(light_source);
 
-            TracerObject floor = new Plane(new Vector3(0, .5f, 0), new Vector3(0, -1, 0), Color.WhiteSmoke, luminance: .2f, reflectivity: .04f, fresnel: .2f); // Assuming up is along y axis
+            TracerObject floor = new Plane(new Vector3(0, .5f, 0), new Vector3(0, -1, 0), Color.WhiteSmoke, luminance: .15f, reflectivity: .04f, fresnel: .3f); // Assuming up is along y axis
             TracerObjects.Add(floor);
 
             Origin = new Vector3(0, 0, 4);
