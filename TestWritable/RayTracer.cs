@@ -40,7 +40,6 @@ namespace TestWritable
                     // Base properties
                     Vector3 hitPoint = ray.PointAtParameter(closest);
                     Vector3 normal = hitObject.NormalAt(hitPoint, ray);
-                    Vector3 offsetPos = hitPoint + normal * 0.01f;  // Offset point along the normal
 
                     //index of refraction
                     float ior = 1.2f; // Replace with the refractive index of the material
@@ -209,7 +208,9 @@ namespace TestWritable
                     bool inShadow = false;
                     foreach (var o in objects)
                     {
-                        if (o != hitObject && o != light && o.Hit(shadowRay, 0.001f, 1.0f, out _))
+                        if (o != hitObject && 
+                            o != light 
+                            && o.Material != MaterialType.Glass && o.Hit(shadowRay, 0.001f, 1.0f, out _))
                         {
                             inShadow = true;
                             break;
