@@ -16,7 +16,7 @@ namespace TestWritable
         static WriteableBitmap writeableBitmap;
         static Window w;
         static Image i;
-        static Scene scene;
+        static GPUScene scene;
 
         [STAThread]
         static void Main(string[] args)
@@ -55,8 +55,8 @@ namespace TestWritable
             w.KeyDown += W_KeyDown;
 
             Application app = new Application();
-            scene = new Scene(writeableBitmap, w.Width, w.Height);
-            scene.Draw();
+            scene = new GPUScene(writeableBitmap, w.Width, w.Height);
+            //scene.Draw();
             app.Run();
         }
 
@@ -85,19 +85,19 @@ namespace TestWritable
             }
 
             // Assuming you have a Render method to redraw the scene
-            scene.Draw();
+            //scene.Draw();
         }
 
         static void i_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            scene.Draw();
+            //scene.Draw();
         }
 
         static void i_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             int column = (int)e.GetPosition(i).X;
             int row = (int)e.GetPosition(i).Y;
-            scene.TracePoint(column, row);
+            //scene.TracePoint(column, row);
         }
 
         static void w_MouseWheel(object sender, MouseWheelEventArgs e)
