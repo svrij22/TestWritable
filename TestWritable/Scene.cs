@@ -27,7 +27,7 @@ namespace TestWritable
             height = Height;
 
             //SPHERE 1
-            var sphere1 = new Sphere(new Vector3(-1.5f, 0, -2), 0.5f, Color.Red,                            .1f, .95f, 1f);
+            var sphere1 = new Sphere(new Vector3(-1.5f, 0, -2), 0.5f, Color.Red,                            .1f, 1f, 1f);
             TracerObjects.Add(sphere1);
 
             //SPHERE 2
@@ -35,7 +35,7 @@ namespace TestWritable
             TracerObjects.Add(sphere2);
 
             //SPHERE 3
-            var sphere3 = new Sphere(new Vector3(1.5f, 0, -2), 0.5f, Color.Green,                           .1f, .01f, 1f);
+            var sphere3 = new Sphere(new Vector3(1.5f, 0, -2), 0.5f, Color.Green,                           .1f, 0f, .3f);
             TracerObjects.Add(sphere3);
 
             //SPHERE BEHIND

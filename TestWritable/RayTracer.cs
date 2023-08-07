@@ -128,7 +128,7 @@ namespace TestWritable
 
             foreach (var light in objects.Where(obj => obj.Luminance > .2f)) // Consider objects with Luminance > 0 as light sources
             {
-                int numSoftShadowRays = 16;
+                int numSoftShadowRays = 8;
                 int numShadowHits = 0;
                 for (int i = 0; i < numSoftShadowRays; i++)
                 {
@@ -151,8 +151,8 @@ namespace TestWritable
                         numShadowHits++;
                     }
 
-                    //Skip if 5 times consequetively zero
-                    if (numShadowHits == 0 && i == 6)
+                    //Skip if x times consequetively zero
+                    if (numShadowHits == 0 && i == (numSoftShadowRays/2))
                         i = numSoftShadowRays;
                 }
 
