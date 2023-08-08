@@ -31,16 +31,15 @@ namespace TestWritable
             width = Width;
             height = Height;
 
-            Context context = Context.Create(builder => builder.AllAccelerators());
-
             Initialize();
-            Run();
+            Compile();
+            Compute();
         }
 
         public static void RendererKernel(Index1D pixelIndex, 
                            int _width, 
                            int _height, 
-                           ArrayView<float> sphereData, 
+                           ArrayView<float> structData, 
                            ArrayView<int> output)
         {
             //Pixel indices
@@ -66,7 +65,7 @@ namespace TestWritable
             var ray = new RayStruct(Origin, Vector3.Normalize(direction));
 
             // Get color
-            int color_data = Tracer.Trace(ray, sphereData);
+            int color_data = Tracer.Trace(ray, structData, 2);
 
             //Set output
             output[pixelIndex] = color_data;
@@ -96,27 +95,34 @@ namespace TestWritable
             accelerator.Dispose();
             context.Dispose();
         }
-        public void Run()
+
+        Action<Index1D, int, int, ArrayView<float>, ArrayView<int>> loadedKernel;
+        MemoryBuffer1D<int, Stride1D.Dense> pixelsOutput;
+        MemoryBuffer1D<float, Stride1D.Dense> structData;
+        public void Compile()
         {
-            var scene1_floats = SceneBuilder.Scene1();
-            MemoryBuffer1D<float, Stride1D.Dense> sphereData = accelerator.Allocate1D<float>(scene1_floats.ToArray());
+            var struct_floats = SceneBuilder.Scene1();
+            structData = accelerator.Allocate1D<float>(struct_floats.ToArray());
 
             //
             // Output pixels
             //
             int amountOfPixels = (int)(width * height);
-            MemoryBuffer1D<int, Stride1D.Dense> pixelsOutput = accelerator.Allocate1D<int>(amountOfPixels);
+            pixelsOutput = accelerator.Allocate1D<int>(amountOfPixels);
 
             //
             // Load / Compile
             //
-            Action<Index1D, int, int, ArrayView<float>, ArrayView<int>> loadedKernel = 
-                accelerator.LoadAutoGroupedStreamKernel<Index1D, int, int, ArrayView<float>, ArrayView<int>>(RendererKernel);
+            loadedKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, int, int, ArrayView<float>, ArrayView<int>>(RendererKernel);
 
+        }
+
+        public void Compute()
+        {
             //
             // Compute
             //
-            loadedKernel((int)pixelsOutput.Length, (int)width, (int)height, sphereData.View, pixelsOutput.View);
+            loadedKernel((int)pixelsOutput.Length, (int)width, (int)height, structData.View, pixelsOutput.View);
 
             // wait for the accelerator to be finished with whatever it's doing
             // in this case it just waits for the kernel to finish.
@@ -124,11 +130,9 @@ namespace TestWritable
 
             // moved output data from the GPU to the CPU for output to console
             int[] hostOutput = pixelsOutput.GetAsArray1D();
-            var t = hostOutput.Where(v => v != -8874316);
-            for (int i = 0; i < 50; i++)
-            {
-                Debug.Write(hostOutput[i]);
-            }
+
+            //Write
+            Debug.WriteLine("render");
 
             //Write to bitmap
             BitmapWriter.Write(writeableBitmap, (int)width, (int)height, hostOutput);

@@ -6,23 +6,25 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using static TestWritable.structs.StructExt;
 
 namespace TestWritable.structs
 {
     public struct SphereStruct
     {
-        public float Luminance;
-        public float Reflectivity;
-        public float Fresnel;
 
         public float Radius;
         public Vector3 Center;
 
-        public int R;
-        public int G;
-        public int B;
+        public float Luminance;
+        public float Reflectivity;
+        public float Fresnel;
+
+        public ColorStruct Color;
 
         public bool IsGlass;
+
+        public int structType;
 
         /// <summary>
         /// Constructor
@@ -50,11 +52,10 @@ namespace TestWritable.structs
             this.Reflectivity = reflectivity;
             this.Fresnel = fresnel;
 
-            this.R = _r;
-            this.G = _g;
-            this.B = _b;
+            this.Color = ColorStruct.FromRGB(_r, _g, _b);
 
             this.IsGlass = isGlass;
+            this.structType = (int)StructType.Sphere;
         }
 
         /// <summary>
@@ -62,10 +63,11 @@ namespace TestWritable.structs
         /// </summary>
         /// <returns></returns>
         /// 
-        public float[] ToFloatArr()
+        public float[] Encode()
         {
             return new float[]
             {
+                structType,
                 Luminance,
                 Reflectivity,
                 Fresnel,
@@ -73,15 +75,12 @@ namespace TestWritable.structs
                 Center.X,
                 Center.Y,
                 Center.Z,
-                R,
-                G,
-                B,
+                Color.R,
+                Color.G,
+                Color.B,
                 IsGlass ? 1 : 0,
+                -123123123 // use -123123123 as end key
             };
-        }
-        public static int AmountFromFloatArr(ArrayView<float> arr)
-        {
-            return (int)(arr.Length / 11);
         }
 
         /// <summary>
@@ -90,25 +89,23 @@ namespace TestWritable.structs
         /// <param name="arr"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public static SphereStruct SphereFromFloatArr(ArrayView<float> arr, int index)
+        public static SphereStruct Decode(ArrayView<float> arr, int readFrom)
         {
-            var baseLength = 11;
             var sphere = new SphereStruct
             {
-                Luminance = arr[index * baseLength],
-                Reflectivity = arr[index * baseLength + 1],
-                Fresnel = arr[index * baseLength + 2],
-                Radius = arr[index * baseLength + 3],
+                structType = (int)arr[readFrom + 0],
+                Luminance = arr[readFrom + 1],
+                Reflectivity = arr[readFrom + 2],
+                Fresnel = arr[readFrom + 3],
+                Radius = arr[readFrom + 4],
                 Center = new Vector3
                 {
-                    X = arr[index * baseLength + 4],
-                    Y = arr[index * baseLength + 5],
-                    Z = arr[index * baseLength + 6]
+                    X = arr[readFrom + 5],
+                    Y = arr[readFrom + 6],
+                    Z = arr[readFrom + 7]
                 },
-                R = (int)arr[index * baseLength + 7],
-                G = (int)arr[index * baseLength + 8],
-                B = (int)arr[index * baseLength + 9],
-                IsGlass = arr[index * baseLength + 10] == 1 ? true : false,
+                Color = ColorStruct.FromRGB((int)arr[readFrom + 8], (int)arr[readFrom + 9], (int)arr[readFrom + 10]),
+                IsGlass = arr[readFrom + 11] == 1 ? true : false,
             };
 
             return sphere;

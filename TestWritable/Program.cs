@@ -58,7 +58,7 @@ namespace TestWritable
             Application app = new Application();
 
             renderer = new GPURenderer(writeableBitmap, w.Width, w.Height);
-            renderer.Run();
+            renderer.Compute();
 
             app.Run();
         }
@@ -92,12 +92,12 @@ namespace TestWritable
             }
 
             // Assuming you have a Render method to redraw the scene
-            renderer.Run();
+            renderer.Compute();
         }
 
         static void i_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            renderer.Run();
+            renderer.Compute();
         }
 
         static void i_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

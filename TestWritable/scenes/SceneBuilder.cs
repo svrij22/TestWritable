@@ -20,14 +20,14 @@ namespace TestWritable.scenes
             var sphere3 = new SphereStruct(new Vector3(1.5f, 0, -2),            0.5f, .1f, 0f, 1f,                0, 0, 255);
             var light_source = new SphereStruct(new Vector3(0f, -2.5f, -2),     0.5f, .1f, .45f, 1f,                255, 255, 255);
 
-            List<float> spheres_floats = new();
-            spheres_floats.AddRange(sphere1.ToFloatArr());
-            spheres_floats.AddRange(sphere2.ToFloatArr());
-            spheres_floats.AddRange(sphere3.ToFloatArr());
-            spheres_floats.AddRange(light_source.ToFloatArr());
+            var plane1 = new PlaneStruct(new Vector3(0, 1, 0), new Vector3(0, -1, 0),   .1f, 0f, 1f,                125, 125, 125);
 
-            if (spheres_floats.Count % sphere1.ToFloatArr().Count() != 0)
-                throw new ArgumentException($"The array length must be a multiple of {sphere1.ToFloatArr().Count()}.");
+            List<float> spheres_floats = new();
+            spheres_floats.AddRange(sphere1.Encode());
+            spheres_floats.AddRange(sphere2.Encode());
+            spheres_floats.AddRange(sphere3.Encode());
+            spheres_floats.AddRange(plane1.Encode());
+            spheres_floats.AddRange(light_source.Encode());
 
             return spheres_floats.ToArray();
         }
