@@ -43,43 +43,6 @@ namespace TestWritable.engine
                 //index of refraction
                 float ior = 1.5f; // Replace with the refractive index of the material
 
-                // For glass materials
-                if (hitObject.IsGlass())
-                {
-
-                    Vector3 outwardNormal;
-                    Vector3 reflected = Vector3.Reflect(ray.Direction, hitObject.NormalAt(hitPoint));
-                    float ni_over_nt;
-                    float reflectProb;
-                    Vector3 refracted;
-                    if (Vector3.Dot(ray.Direction, normal) > 0)
-                    {
-                        outwardNormal = -normal;
-                        ni_over_nt = ior;  // ior is the refractive index for the material
-                        reflectProb = FresnelReflection(ray.Direction, normal, ior);
-                    }
-                    else
-                    {
-                        outwardNormal = normal;
-                        ni_over_nt = 1.0f / ior;
-                        reflectProb = FresnelReflection(ray.Direction, -normal, ior);
-                    }
-                    static float Lerp(float a, float b, float t)
-                    {
-                        return (1 - t) * a + t * b;
-                    }
-                    reflectProb = Lerp(reflectProb, 0.5f, 0.1f);
-
-                    Refract(ray.Direction, outwardNormal, ni_over_nt, out refracted);
-                    RayStruct refractedRay = new RayStruct(hitPoint, refracted);
-                    var refractCol = Trace(refractedRay, objects, depth + 1);
-
-                    RayStruct reflectedRay = new RayStruct(hitPoint, reflected);
-                    var reflectCol = Trace(reflectedRay, objects, depth + 1);
-
-                    return Ext.MixColors(refractCol, reflectCol, 1 - reflectProb);
-                }
-
                 // Fresnel reflection coefficient
                 float reflectionCoefficient = 0f;
                 if (hitObject.Fresnel > 0)
