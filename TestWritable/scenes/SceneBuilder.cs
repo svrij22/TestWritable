@@ -17,7 +17,7 @@ namespace TestWritable.scenes
             //
             var sphere1 = new SphereStruct(new Vector3(-1.5f, 0, -2),           0.5f, .1f, .97f, 1f,                255, 0, 0);
             var sphere2 = new SphereStruct(new Vector3(0, 0, -3),               0.5f, .1f, .2f, 1f,                 0, 255, 0);
-            var sphere3 = new SphereStruct(new Vector3(1.5f, 0, -2),            0.5f, .1f, .45f, 1f,                0, 0, 255);
+            var sphere3 = new SphereStruct(new Vector3(1.5f, 0, -2),            0.5f, .1f, 0f, 1f,                0, 0, 255);
             var light_source = new SphereStruct(new Vector3(0f, -2.5f, -2),     0.5f, .1f, .45f, 1f,                255, 255, 255);
 
             List<float> spheres_floats = new();

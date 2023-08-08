@@ -12,6 +12,7 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using TestWritable.engine;
 using TestWritable.renderer;
+using TestWritable.scenes;
 using TestWritable.structs;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
@@ -41,6 +42,9 @@ namespace TestWritable
         /// <summary>
         /// Test method for gpu acceleration
         /// </summary>
+        public void Dispose()
+        {
+        }
         public void Run()
         {
             // Initialize ILGPU.
@@ -51,18 +55,8 @@ namespace TestWritable
             //
             // Input spheres
             //
-            var sphere1 = new SphereStruct(new Vector3(-1.5f, 0, -2),   0.5f, .1f,      .97f, 1f);
-            var sphere2 = new SphereStruct(new Vector3(0, 0, -3),       0.5f, .1f,      .2f, 1f);
-            var sphere3 = new SphereStruct(new Vector3(1.5f, 0, -2),   0.5f, .1f,      .45f, 1f);
-
-            List<float> spheres_floats = new();
-            spheres_floats.AddRange(sphere1.ToFloatArr());
-            spheres_floats.AddRange(sphere2.ToFloatArr());
-            spheres_floats.AddRange(sphere3.ToFloatArr());
-            if (spheres_floats.Count % sphere1.ToFloatArr().Count() != 0)
-                throw new ArgumentException($"The array length must be a multiple of {sphere1.ToFloatArr().Count()}.");
-
-            MemoryBuffer1D<float, Stride1D.Dense> sphereData = accelerator.Allocate1D<float>(spheres_floats.ToArray());
+            var scene1_floats = SceneBuilder.Scene1();
+            MemoryBuffer1D<float, Stride1D.Dense> sphereData = accelerator.Allocate1D<float>(scene1_floats.ToArray());
 
             //
             // Output pixels

@@ -61,6 +61,7 @@ namespace TestWritable.structs
         /// Convert to FloatArray
         /// </summary>
         /// <returns></returns>
+        /// 
         public float[] ToFloatArr()
         {
             return new float[]
@@ -91,22 +92,23 @@ namespace TestWritable.structs
         /// <exception cref="ArgumentException"></exception>
         public static SphereStruct SphereFromFloatArr(ArrayView<float> arr, int index)
         {
+            var baseLength = 11;
             var sphere = new SphereStruct
             {
-                Luminance = arr[index * 10],
-                Reflectivity = arr[index * 10 + 1],
-                Fresnel = arr[index * 10 + 2],
-                Radius = arr[index * 10 + 3],
+                Luminance = arr[index * baseLength],
+                Reflectivity = arr[index * baseLength + 1],
+                Fresnel = arr[index * baseLength + 2],
+                Radius = arr[index * baseLength + 3],
                 Center = new Vector3
                 {
-                    X = arr[index * 10 + 4],
-                    Y = arr[index * 10 + 5],
-                    Z = arr[index * 10 + 6]
+                    X = arr[index * baseLength + 4],
+                    Y = arr[index * baseLength + 5],
+                    Z = arr[index * baseLength + 6]
                 },
-                R = (int)arr[index * 10 + 7],
-                G = (int)arr[index * 10 + 8],
-                B = (int)arr[index * 10 + 9],
-                IsGlass = arr[index * 10 + 10] == 1 ? true : false,
+                R = (int)arr[index * baseLength + 7],
+                G = (int)arr[index * baseLength + 8],
+                B = (int)arr[index * baseLength + 9],
+                IsGlass = arr[index * baseLength + 10] == 1 ? true : false,
             };
 
             return sphere;
@@ -164,6 +166,28 @@ namespace TestWritable.structs
 
             t = 0;
             return false;
+        }
+
+        /// <summary>
+        /// Random points
+        /// </summary>
+        public Vector3 GetRandomPoint()
+        {
+            /*double rand1 = random.NextDouble();
+            double rand2 = random.NextDouble();
+            if (rand1 == 0)
+                random = new Random();
+
+            float theta = (float)(rand1 * 2d * Math.PI);    // Random value between [0, 2π]
+            float phi = (float)(Math.Acos(2 * rand2 - 1d)); // Random value between [0, π]
+
+            float x = (float)(Radius * Math.Sin(phi) * Math.Cos(theta));
+            float y = (float)(Radius * Math.Sin(phi) * Math.Sin(theta));
+            float z = (float)(Radius * Math.Cos(phi));
+
+            return new Vector3(Center.X + x, Center.Y + y, Center.Z + z);*/
+
+            return Center;
         }
     }
 }

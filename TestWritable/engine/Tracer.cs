@@ -37,8 +37,8 @@ namespace TestWritable.engine
             {
                 // Get color when reaching max depth
                 int red = hitObject.R;
-                int green = (int)(hitObject.G);
-                int blue = (int)(hitObject.B);
+                int green = hitObject.G;
+                int blue = hitObject.B;
 
                 //Calc direct color
                 var directColor = Ext.RGBToColorInt(red, green, blue);

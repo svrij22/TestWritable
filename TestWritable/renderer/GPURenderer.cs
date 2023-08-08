@@ -99,7 +99,7 @@ namespace TestWritable
         public void Run()
         {
             var scene1_floats = SceneBuilder.Scene1();
-            MemoryBuffer1D<float, Stride1D.Dense> sphereData = accelerator.Allocate1D<float>(spheres_floats.ToArray());
+            MemoryBuffer1D<float, Stride1D.Dense> sphereData = accelerator.Allocate1D<float>(scene1_floats.ToArray());
 
             //
             // Output pixels

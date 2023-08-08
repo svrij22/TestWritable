@@ -27,7 +27,7 @@ namespace TestWritable
 
             w = new Window();
             w.Height = 400;
-            w.Width = 500;
+            w.Width = 600;
             w.Content = i;
             w.Show();
             w.Closing += W_Closing;

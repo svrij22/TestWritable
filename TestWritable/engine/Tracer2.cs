@@ -9,11 +9,11 @@ using TestWritable.structs;
 
 namespace TestWritable.engine
 {
-    internal class RayTracerOld
+    internal class Tracer2
     {
         public static int Trace(RayStruct ray, ArrayView<float> sphereData, int depth = 0)
         {
-            const int MAX_DEPTH = 4;
+            const int MAX_DEPTH = 1;
 
             //Gets the closest object
             float closest = float.MaxValue;
@@ -91,10 +91,10 @@ namespace TestWritable.engine
                     if (hitObject.Fresnel > 0)
                         reflectionCoefficient = FresnelReflection(ray.Direction, normal, ior) * hitObject.Fresnel;
                     reflectionCoefficient += hitObject.Reflectivity;
-                    reflectionCoefficient = Math.Clamp(reflectionCoefficient, 0, 1);
+                    reflectionCoefficient = IntrinsicMath.Clamp(reflectionCoefficient, 0f, 1f);
 
                     //Bounce ray
-                    Ray bouncedRay = ray.Bounce(hitPoint, normal);
+                    RayStruct bouncedRay = ray.Bounce(hitPoint, normal);
 
                     // Trace the bounced ray
                     var bounceColour = Trace(bouncedRay, sphereData, depth + 1);
@@ -111,9 +111,9 @@ namespace TestWritable.engine
                 else
                 {
                     // Get color when reaching max depth
-                    var red = (int)(hitObject.Color.R);
-                    var green = (int)(hitObject.Color.G);
-                    var blue = (int)(hitObject.Color.B);
+                    var red = (int)(hitObject.R);
+                    var green = (int)(hitObject.G);
+                    var blue = (int)(hitObject.B);
                     var directColor = Ext.RGBToColorInt(red, green, blue);
 
                     // Return direct color
@@ -211,12 +211,12 @@ namespace TestWritable.engine
                     continue;
 
                 //Cast 8 rays
-                int numSoftShadowRays = 30;
+                int numSoftShadowRays = 5;
                 int numShadowHits = 0;
                 for (int i2 = 0; i2 < numSoftShadowRays; i2++)
                 {
                     //Point to random object on light
-                    Vector3 randomPointOnLight = SphereStruct.GetRandomPoint(); // Assuming your TracerObject can provide a random point on its surface
+                    Vector3 randomPointOnLight = luminant_object.GetRandomPoint(); // Assuming your TracerObject can provide a random point on its surface
                     Vector3 lightDir = Vector3.Normalize(randomPointOnLight - hitPoint);
                     RayStruct shadowRay = new RayStruct(hitPoint, lightDir);
 
@@ -250,8 +250,7 @@ namespace TestWritable.engine
                 float shadowFactor = 1.0f - (float)numShadowHits / numSoftShadowRays;
                 diffuseLightIntensity += luminant_object.Luminance * shadowFactor * Math.Max(0, Vector3.Dot(Vector3.Normalize(luminant_object.Center - hitPoint), normal));
             }
-
-            diffuseLightIntensity = Math.Clamp(diffuseLightIntensity, 0, 1);
+            diffuseLightIntensity = IntrinsicMath.Clamp(diffuseLightIntensity, 0.0f, 1.0f);
 
             var red = (int)(hitObject.R * diffuseLightIntensity);
             var green = (int)(hitObject.G * diffuseLightIntensity);
