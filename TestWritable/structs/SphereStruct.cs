@@ -22,6 +22,8 @@ namespace TestWritable.structs
         public int G;
         public int B;
 
+        public bool IsGlass;
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -38,7 +40,8 @@ namespace TestWritable.structs
                             float fresnel = 0f,
                             int _r = 255,
                             int _g = 255,
-                            int _b = 255)
+                            int _b = 255,
+                            bool isGlass = false)
         {
             this.Radius = radius;
             this.Center = center;
@@ -50,6 +53,8 @@ namespace TestWritable.structs
             this.R = _r;
             this.G = _g;
             this.B = _b;
+
+            this.IsGlass = isGlass;
         }
 
         /// <summary>
@@ -69,12 +74,13 @@ namespace TestWritable.structs
                 Center.Z,
                 R,
                 G,
-                B
+                B,
+                IsGlass ? 1 : 0,
             };
         }
         public static int AmountFromFloatArr(ArrayView<float> arr)
         {
-            return (int)(arr.Length / 10);
+            return (int)(arr.Length / 11);
         }
 
         /// <summary>
@@ -99,7 +105,8 @@ namespace TestWritable.structs
                 },
                 R = (int)arr[index * 10 + 7],
                 G = (int)arr[index * 10 + 8],
-                B = (int)arr[index * 10 + 9]
+                B = (int)arr[index * 10 + 9],
+                IsGlass = arr[index * 10 + 10] == 1 ? true : false,
             };
 
             return sphere;
