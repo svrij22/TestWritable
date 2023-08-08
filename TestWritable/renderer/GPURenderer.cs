@@ -65,7 +65,7 @@ namespace TestWritable
             var ray = new RayStruct(Origin, Vector3.Normalize(direction));
 
             // Get color
-            int color_data = Tracer.Trace(ray, structData, 2);
+            int color_data = Tracer.Trace(ray, structData, 5);
 
             //Set output
             output[pixelIndex] = color_data;
@@ -123,7 +123,8 @@ namespace TestWritable
             // Compute
             //
 
-            //Write
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start(); // Start measuring time
             Debug.WriteLine("render started");
 
             loadedKernel((int)pixelsOutput.Length, (int)width, (int)height, structData.View, pixelsOutput.View);
@@ -137,6 +138,8 @@ namespace TestWritable
 
             //Write
             Debug.WriteLine("render finished");
+            stopwatch.Stop(); // Stop measuring time
+            Debug.WriteLine($"Execution Time: {stopwatch.ElapsedMilliseconds} ms");
 
             //Write to bitmap
             BitmapWriter.Write(writeableBitmap, (int)width, (int)height, hostOutput);

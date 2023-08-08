@@ -23,51 +23,6 @@ namespace TestWritable
         {
             return new Vector3(vector.X * scalar, vector.Y * scalar, vector.Z * scalar);
         }
-
-        internal static int MixColors(int color1, int color2, float weight)
-        {
-            float inverseWeight = 1.0f - weight;
-
-            // Extract RGB components from color1
-            int r1 = (color1 >> 16) & 0xFF;
-            int g1 = (color1 >> 8) & 0xFF;
-            int b1 = color1 & 0xFF;
-
-            // Extract RGB components from color2
-            int r2 = (color2 >> 16) & 0xFF;
-            int g2 = (color2 >> 8) & 0xFF;
-            int b2 = color2 & 0xFF;
-
-            // Calculate mixed RGB components
-            int mixedR = (int)(r1 * weight + r2 * inverseWeight);
-            int mixedG = (int)(g1 * weight + g2 * inverseWeight);
-            int mixedB = (int)(b1 * weight + b2 * inverseWeight);
-
-            // Construct the mixed color
-            return (255 << 24) | (mixedR << 16) | (mixedG << 8) | mixedB;
-        }
-        public static int MultiplyColor(int color, float factor)
-        {
-            // Extract the individual color components (R, G, B)
-            int red = (color >> 16) & 0xFF;
-            int green = (color >> 8) & 0xFF;
-            int blue = color & 0xFF;
-
-            // Multiply each color component by the factor
-            red = (int)(red * factor);
-            green = (int)(green * factor);
-            blue = (int)(blue * factor);
-
-            // Clamp the color values to the range [0, 255]
-            red = Math.Max(0, Math.Min(255, red));
-            green = Math.Max(0, Math.Min(255, green));
-            blue = Math.Max(0, Math.Min(255, blue));
-
-            // Combine the color components and return the resulting color
-            int resultColor = (red << 16) | (green << 8) | blue;
-            return resultColor;
-        }
-
         public static float GetIntensity(int color)
         {
             // Extract the individual color components (R, G, B)

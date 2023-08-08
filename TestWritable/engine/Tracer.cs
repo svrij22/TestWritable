@@ -12,6 +12,13 @@ namespace TestWritable.engine
 {
     internal class Tracer
     {
+        /// <summary>
+        /// In plaats hiervan met accumulated colors en attenuations gewoon 2 functies gebruiken. Een voor aanroepen en 1 voor traceren
+        /// </summary>
+        /// <param name="ray"></param>
+        /// <param name="structData"></param>
+        /// <param name="maxDepth"></param>
+        /// <returns></returns>
         public static int Trace(RayStruct ray, ArrayView<float> structData, int maxDepth)
         {
             int currentDepth = 0;
@@ -71,11 +78,6 @@ namespace TestWritable.engine
             }
 
             return Ext.RGBToColorInt(accumulatedColor.R, accumulatedColor.G, accumulatedColor.B);
-        }
-        private static float SchlickFresnel(float r0, float cosTheta)
-        {
-            float oneMinusCosTheta = 1.0f - cosTheta;
-            return r0 + (1.0f - r0) * oneMinusCosTheta * oneMinusCosTheta * oneMinusCosTheta * oneMinusCosTheta * oneMinusCosTheta;
         }
 
         public static void HitTest(RayStruct ray, ArrayView<float> structData, out float closest, out StructWrapper hitObject, out bool hasHit)
