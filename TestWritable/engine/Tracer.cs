@@ -18,6 +18,9 @@ namespace TestWritable.engine
             ColorStruct accumulatedColor = new ColorStruct { R = 0, G = 0, B = 0 };
             ColorStruct currentAttenuation = new ColorStruct { R = 255, G = 255, B = 255 };  // start with full color
 
+            Vector3 lightPosition = new Vector3(0, -3, 0); // Some arbitrary direction for the light
+            Vector3.Normalize(lightPosition);
+
             //While not reached max depth
             while (currentDepth < maxDepth)
             {
@@ -29,30 +32,34 @@ namespace TestWritable.engine
 
                 if (hasHit)
                 {
-                    //hitpoint and normal
                     Vector3 hitPoint = ray.Origin + ray.Direction * closest;
                     var normal = hitObject.NormalAt(hitPoint);
 
-                    // Prepare for the next ray
+                    // Calculate direction from hitPoint to light source
+                    Vector3 toLight = lightPosition - hitPoint;
+                    Vector3.Normalize(toLight);
+
+                    // Calculate the Lambertian reflection factor
+                    float lambert = Math.Max(Vector3.Dot(normal, toLight), 0);
+
                     ray = ray.Bounce(hitPoint, normal);
                     currentDepth++;
 
-                    //reflectivity
                     var reflectivity = hitObject.GetReflectivity();
 
-                    //Get color
                     var ownColour = hitObject.GetColor();
-                    var scaledColour = ColorStruct.Scale(ownColour, 1 - reflectivity);
+                    var lambertColor = ColorStruct.Scale(ownColour, lambert); // This scales the object's color by the Lambertian factor
                     accumulatedColor = ColorStruct.Add(accumulatedColor, ColorStruct.Scale(scaledColour, currentAttenuation));
 
-                    // Check reflectivity before continuing the loop
                     if (reflectivity < 0.01f)
                         break;
 
-                    // Update the attenuation for the next depth (this can be adjusted for more complex materials)
-                    currentAttenuation = ColorStruct.Scale(currentAttenuation, new ColorStruct { R = (int)(reflectivity * 255), 
-                                                                                          G = (int)(reflectivity * 255), 
-                                                                                          B = (int)(reflectivity * 255) });
+                    currentAttenuation = ColorStruct.Scale(currentAttenuation, new ColorStruct
+                    {
+                        R = (int)(reflectivity * 255),
+                        G = (int)(reflectivity * 255),
+                        B = (int)(reflectivity * 255)
+                    });
                 }
                 else
                 {
