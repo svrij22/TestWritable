@@ -49,6 +49,7 @@ namespace TestWritable.engine
 
                     var ownColour = hitObject.GetColor();
                     var lambertColor = ColorStruct.Scale(ownColour, lambert); // This scales the object's color by the Lambertian factor
+                    var scaledColour = ColorStruct.Scale(lambertColor, 1 - reflectivity);
                     accumulatedColor = ColorStruct.Add(accumulatedColor, ColorStruct.Scale(scaledColour, currentAttenuation));
 
                     if (reflectivity < 0.01f)
