@@ -111,7 +111,7 @@ namespace TestWritable.structs
         /// <param name="point"></param>
         /// <returns></returns>
         /// <param name="r"></param>
-        public Vector3 NormalAt(Vector3 point, Ray r)
+        public Vector3 NormalAt(Vector3 point)
         {
             Vector3 normalVector = Vector3.Subtract(point, Center);
             normalVector = Vector3.Normalize(normalVector);

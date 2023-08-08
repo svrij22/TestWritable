@@ -16,7 +16,7 @@ namespace TestWritable
         static WriteableBitmap writeableBitmap;
         static Window w;
         static Image i;
-        static GPUScene scene;
+        static GPURenderer renderer;
 
         [STAThread]
         static void Main(string[] args)
@@ -26,10 +26,11 @@ namespace TestWritable
             RenderOptions.SetEdgeMode(i, EdgeMode.Aliased);
 
             w = new Window();
-            w.Height = 700;
-            w.Width = 1300;
+            w.Height = 400;
+            w.Width = 500;
             w.Content = i;
             w.Show();
+            w.Closing += W_Closing;
 
             writeableBitmap = new WriteableBitmap(
                 (int)w.ActualWidth,
@@ -55,9 +56,15 @@ namespace TestWritable
             w.KeyDown += W_KeyDown;
 
             Application app = new Application();
-            scene = new GPUScene(writeableBitmap, w.Width, w.Height);
-            //scene.Draw();
+
+            renderer = new GPURenderer(writeableBitmap, w.Width, w.Height);
+            renderer.Run();
+
             app.Run();
+        }
+        private static void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            renderer.Dispose();
         }
 
         private static void W_KeyDown(object sender, KeyEventArgs e)
@@ -68,29 +75,29 @@ namespace TestWritable
             {
                 case Key.A:
                     // Move left
-                    scene.Origin = new Vector3(scene.Origin.X - Speed,    scene.Origin.Y,          scene.Origin.Z);
+                    renderer.Origin = new Vector3(renderer.Origin.X - Speed,    renderer.Origin.Y,          renderer.Origin.Z);
                     break;
                 case Key.D:
                     // Move right
-                    scene.Origin = new Vector3(scene.Origin.X + Speed,    scene.Origin.Y,          scene.Origin.Z);
+                    renderer.Origin = new Vector3(renderer.Origin.X + Speed,    renderer.Origin.Y,          renderer.Origin.Z);
                     break;
                 case Key.W:
                     // Move left
-                    scene.Origin = new Vector3(scene.Origin.X,            scene.Origin.Y ,         scene.Origin.Z - Speed);
+                    renderer.Origin = new Vector3(renderer.Origin.X,            renderer.Origin.Y ,         renderer.Origin.Z - Speed);
                     break;
                 case Key.S:
                     // Move right
-                    scene.Origin = new Vector3(scene.Origin.X,            scene.Origin.Y ,         scene.Origin.Z + Speed);
+                    renderer.Origin = new Vector3(renderer.Origin.X,            renderer.Origin.Y ,         renderer.Origin.Z + Speed);
                     break;
             }
 
             // Assuming you have a Render method to redraw the scene
-            //scene.Draw();
+            renderer.Run();
         }
 
         static void i_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            //scene.Draw();
+            renderer.Run();
         }
 
         static void i_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

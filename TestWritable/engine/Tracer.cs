@@ -8,7 +8,7 @@ using TestWritable.structs;
 
 namespace TestWritable.engine
 {
-    internal class GPUTracer
+    internal class Tracer
     {
         public static int Trace(RayStruct ray, ArrayView<float> sphereData)
         {
