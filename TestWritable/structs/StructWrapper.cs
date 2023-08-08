@@ -21,6 +21,21 @@ namespace TestWritable.structs
         }
 
         /// <summary>
+        /// Is glass
+        /// </summary>
+        public bool IsGlass()
+        {
+            if (floatData[readFrom] == (float)StructType.Sphere)
+            {
+                SphereStruct sStruct = SphereStruct.Decode(floatData, readFrom);
+                return sStruct.IsGlass;
+            }
+
+            //Failure
+            return false;
+        }
+
+        /// <summary>
         /// Hit switch
         /// </summary>
         public float GetReflectivity()
