@@ -122,6 +122,10 @@ namespace TestWritable
             //
             // Compute
             //
+
+            //Write
+            Debug.WriteLine("render started");
+
             loadedKernel((int)pixelsOutput.Length, (int)width, (int)height, structData.View, pixelsOutput.View);
 
             // wait for the accelerator to be finished with whatever it's doing
@@ -132,7 +136,7 @@ namespace TestWritable
             int[] hostOutput = pixelsOutput.GetAsArray1D();
 
             //Write
-            Debug.WriteLine("render");
+            Debug.WriteLine("render finished");
 
             //Write to bitmap
             BitmapWriter.Write(writeableBitmap, (int)width, (int)height, hostOutput);
