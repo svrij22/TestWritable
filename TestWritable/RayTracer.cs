@@ -13,6 +13,15 @@ namespace TestWritable
 {
     internal class RayTracer
     {
+        /// <summary>
+        /// Eerst alles opdelen in methoden
+        /// Daarna de hele trace doen
+        /// Dan backtrack kleuren mengen
+        /// </summary>
+        /// <param name="ray"></param>
+        /// <param name="objects"></param>
+        /// <param name="depth"></param>
+        /// <returns></returns>
         public static int Trace(Ray ray, List<TracerObject> objects, int depth = 0)
         {
             const int MAX_DEPTH = 4;
@@ -45,43 +54,6 @@ namespace TestWritable
                     //index of refraction
                     float ior = 1.5f; // Replace with the refractive index of the material
 
-                    // For glass materials
-                    if (hitObject.Material == MaterialType.Glass)
-                    {
-
-                        Vector3 outwardNormal;
-                        Vector3 reflected = Vector3.Reflect(ray.Direction, hitObject.NormalAt(hitPoint, ray));
-                        float ni_over_nt;
-                        float reflectProb;
-                        Vector3 refracted;
-                        if (Vector3.Dot(ray.Direction, normal) > 0)
-                        {
-                            outwardNormal = -normal;
-                            ni_over_nt = ior;  // ior is the refractive index for the material
-                            reflectProb = FresnelReflection(ray.Direction, normal, ior);
-                        }
-                        else
-                        {
-                            outwardNormal = normal;
-                            ni_over_nt = 1.0f / ior;
-                            reflectProb = FresnelReflection(ray.Direction, -normal, ior);
-                        }
-                        static float Lerp(float a, float b, float t)
-                        {
-                            return (1 - t) * a + t * b;
-                        }
-                        reflectProb = Lerp(reflectProb, 0.5f, 0.1f);
-
-                        Refract(ray.Direction, outwardNormal, ni_over_nt, out refracted);
-                        Ray refractedRay = new Ray(hitPoint, refracted);
-                        var refractCol = Trace(refractedRay, objects, depth + 1);
-
-                        Ray reflectedRay = new Ray(hitPoint, reflected);
-                        var reflectCol = Trace(reflectedRay, objects, depth + 1);
-
-                        return Ext.MixColors(refractCol, reflectCol, 1-reflectProb);
-                    }
-
                     // Fresnel reflection coefficient
                     float reflectionCoefficient = 0f;
                     if (hitObject.Fresnel > 0)
@@ -93,13 +65,13 @@ namespace TestWritable
                     Ray bouncedRay = ray.Bounce(hitPoint, normal);
 
                     // Trace the bounced ray
-                    var bounceColour = Trace(bouncedRay, objects, depth + 1);
+                    int bounceColour = Trace(bouncedRay, objects, depth + 1);
 
                     // Calculate the diffuse colour
-                    var diffuseColour = GetDiffuseColour(hitObject, objects, hitPoint, normal);
+                    int diffuseColour = GetDiffuseColour(hitObject, objects, hitPoint, normal);
 
                     // Mix the colours
-                    var mixedColour = Ext.MixColors(bounceColour, diffuseColour, reflectionCoefficient);
+                    int mixedColour = Ext.MixColors(bounceColour, diffuseColour, reflectionCoefficient);
 
                     // Return mixed colour
                     return mixedColour;
@@ -202,42 +174,7 @@ namespace TestWritable
             var luminant_objects = objects.Where(obj => obj.Luminance > .2f);
             foreach (var light in luminant_objects) // Consider objects with Luminance > 0 as light sources
             {
-                
-                //Cast 8 rays
-                int numSoftShadowRays = 30;
-                int numShadowHits = 0;
-                for (int i = 0; i < numSoftShadowRays; i++)
-                {
-                    //Point to random object on light
-                    Vector3 randomPointOnLight = light.GetRandomPoint(); // Assuming your TracerObject can provide a random point on its surface
-                    Vector3 lightDir = Vector3.Normalize(randomPointOnLight - hitPoint);
-                    Ray shadowRay = new Ray(hitPoint, lightDir);
-
-                    //Check if ray is in shadow
-                    bool inShadow = false;
-                    foreach (var o in objects)
-                    {
-                        if (o != hitObject && 
-                            o != light 
-                            && o.Material != MaterialType.Glass && o.Hit(shadowRay, 0.001f, 1.0f, out _))
-                        {
-                            inShadow = true;
-                            break;
-                        }
-                    }
-
-                    //Shadow hits
-                    if (inShadow)
-                        numShadowHits++;
-
-                    //Skip if x times consequetively zero
-                    if (numShadowHits == 0 && i == (numSoftShadowRays/2))
-                        i = numSoftShadowRays;
-                }
-
-                //Calculate shadow factor
-                float shadowFactor = 1.0f - (float)numShadowHits / numSoftShadowRays;
-                diffuseLightIntensity += light.Luminance * shadowFactor * Math.Max(0, Vector3.Dot(Vector3.Normalize(light.Center - hitPoint), normal));
+                diffuseLightIntensity += light.Luminance * Math.Max(0, Vector3.Dot(Vector3.Normalize(light.Center - hitPoint), normal));
             }
 
             diffuseLightIntensity = Math.Clamp(diffuseLightIntensity, 0, 1);

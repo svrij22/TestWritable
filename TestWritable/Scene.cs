@@ -139,9 +139,6 @@ namespace TestWritable
 
                 // Create a 2D array to hold color data
                 int[,] colorData = DoRaytrace();
-                float[,] brightPixels = GetBrightPixels(colorData);
-                int[,] blurredBrightPixels = ExtractAndBlurBrightPixels(brightPixels, colorData, .96f);
-                int[,] combined = CombineImages(blurredBrightPixels, colorData);
 
                 // Reserve the back buffer for updates.
                 writeableBitmap.Lock();
@@ -152,7 +149,7 @@ namespace TestWritable
                 {
                     for (int j = 0; j < width; j++)
                     {
-                        flatArray[(int)(i * width + j)] = combined[j, i];
+                        flatArray[(int)(i * width + j)] = colorData[j, i];
                     }
                 }
 
