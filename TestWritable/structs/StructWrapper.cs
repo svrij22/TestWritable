@@ -27,31 +27,22 @@ namespace TestWritable.structs
         }
         public float GetLuminance()
         {
-            if (floatData[readFrom] == (float)StructType.Sphere) return SphereStruct.Decode(floatData, readFrom).Luminance;
-            if (floatData[readFrom] == (float)StructType.Plane) return PlaneStruct.Decode(floatData, readFrom).Luminance;
-            if (floatData[readFrom] == (float)StructType.Rectangle) return RectangleStruct.Decode(floatData, readFrom).Luminance;
-            return 0;
+            return floatData[readFrom + IndexConstants.Luminance];
         }
         public float GetFresnel()
         {
-            if (floatData[readFrom] == (float)StructType.Sphere) return SphereStruct.Decode(floatData, readFrom).Fresnel;
-            if (floatData[readFrom] == (float)StructType.Plane) return PlaneStruct.Decode(floatData, readFrom).Fresnel;
-            if (floatData[readFrom] == (float)StructType.Rectangle) return RectangleStruct.Decode(floatData, readFrom).Fresnel;
-            return 0;
+            return floatData[readFrom + IndexConstants.Fresnel];
         }
         public float GetReflectivity()
         {
-            if (floatData[readFrom] == (float)StructType.Sphere) return SphereStruct.Decode(floatData, readFrom).Reflectivity;
-            if (floatData[readFrom] == (float)StructType.Plane) return PlaneStruct.Decode(floatData, readFrom).Reflectivity;
-            if (floatData[readFrom] == (float)StructType.Rectangle) return RectangleStruct.Decode(floatData, readFrom).Reflectivity;
-            return 0;
+            return floatData[readFrom + IndexConstants.Reflectivity];
         }
         public ColorStruct GetColor()
         {
-            if (floatData[readFrom] == (float)StructType.Sphere) return SphereStruct.Decode(floatData, readFrom).Color;
-            if (floatData[readFrom] == (float)StructType.Plane) return PlaneStruct.Decode(floatData, readFrom).Color;
-            if (floatData[readFrom] == (float)StructType.Rectangle) return RectangleStruct.Decode(floatData, readFrom).Color;
-            return new ColorStruct();
+            int r = (int)floatData[readFrom + IndexConstants.ColorR];
+            int g = (int)floatData[readFrom + IndexConstants.ColorG];
+            int b = (int)floatData[readFrom + IndexConstants.ColorB];
+            return ColorStruct.FromRGB(r, g, b);
         }
         public Vector3 NormalAt(Vector3 point, RayStruct ray)
         {

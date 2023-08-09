@@ -41,10 +41,6 @@ namespace TestWritable
                            ArrayView<float> structData, 
                            ArrayView<int> output)
         {
-            //Create arrays for storing colors
-            float[] colorArray = new float[10];
-            float[] mixtureArray = new float[10];
-
             //Pixel indices
             int img_x = pixelIndex % _width;
             int img_y = pixelIndex / _width;
@@ -87,9 +83,12 @@ namespace TestWritable
         public void Initialize()
         {
             // Initialize ILGPU.
+            //context = Context.Create().Math(MathMode.Fast).Optimize(OptimizationLevel.O2).ToContext();
+            //accelerator = context.GetPreferredDevice(preferCPU: true).CreateAccelerator(context);
+
             context = Context.CreateDefault();
-            accelerator = context.GetPreferredDevice(preferCPU: false)
-                                      .CreateAccelerator(context);
+            accelerator = context.GetPreferredDevice(preferCPU: true)
+                .CreateAccelerator(context);
         }
 
         public void Dispose()

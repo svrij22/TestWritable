@@ -10,6 +10,24 @@ using static TestWritable.structs.StructExt;
 
 namespace TestWritable.structs
 {
+    public static class IndexConstants
+    {
+        public const int StructType = 0;
+
+        public const int ColorR = 1;
+        public const int ColorG = 2;
+        public const int ColorB = 3;
+
+        public const int Luminance = 4;
+        public const int Reflectivity = 5;
+        public const int Fresnel = 6;
+
+        public const int Radius = 4;
+        public const int CenterX = 5;
+        public const int CenterY = 6;
+        public const int CenterZ = 7;
+        public const int IsGlass = 11;
+    }
     public struct SphereStruct
     {
 
@@ -68,18 +86,20 @@ namespace TestWritable.structs
             return new float[]
             {
                 structType,
+
+                Color.R,
+                Color.G,
+                Color.B,
+
                 Luminance,
                 Reflectivity,
                 Fresnel,
+
                 Radius,
                 Center.X,
                 Center.Y,
                 Center.Z,
-                Color.R,
-                Color.G,
-                Color.B,
                 IsGlass ? 1 : 0,
-                -123123123 // use -123123123 as end key
             };
         }
 
@@ -93,18 +113,21 @@ namespace TestWritable.structs
         {
             var sphere = new SphereStruct
             {
-                structType = (int)arr[readFrom + 0],
-                Luminance = arr[readFrom + 1],
-                Reflectivity = arr[readFrom + 2],
-                Fresnel = arr[readFrom + 3],
-                Radius = arr[readFrom + 4],
+                structType = (int)arr[readFrom + IndexConstants.StructType],
+                Color = ColorStruct.FromRGB((int)arr[readFrom + IndexConstants.ColorR], 
+                                            (int)arr[readFrom + IndexConstants.ColorG], 
+                                            (int)arr[readFrom + IndexConstants.ColorB]),
+                Luminance = arr[readFrom + IndexConstants.Luminance],
+                Reflectivity = arr[readFrom + IndexConstants.Reflectivity],
+                Fresnel = arr[readFrom + IndexConstants.Fresnel],
+
+                Radius = arr[readFrom + 7],
                 Center = new Vector3
                 {
-                    X = arr[readFrom + 5],
-                    Y = arr[readFrom + 6],
-                    Z = arr[readFrom + 7]
+                    X = arr[readFrom + 8],
+                    Y = arr[readFrom + 9],
+                    Z = arr[readFrom + 10]
                 },
-                Color = ColorStruct.FromRGB((int)arr[readFrom + 8], (int)arr[readFrom + 9], (int)arr[readFrom + 10]),
                 IsGlass = arr[readFrom + 11] == 1 ? true : false,
             };
 

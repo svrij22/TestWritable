@@ -26,8 +26,8 @@ namespace TestWritable
             RenderOptions.SetEdgeMode(i, EdgeMode.Aliased);
 
             w = new Window();
-            w.Height = 800;
-            w.Width = 1200;
+            w.Height = 123;
+            w.Width = 123;
             w.Content = i;
             w.Show();
             w.Closing += W_Closing;

@@ -53,7 +53,7 @@ namespace TestWritable.engine
         }
         public static int Trace(RayStruct ray, ArrayView<float> structData)
         {
-            const int MAX_DEPTH = 4;
+            const int MAX_DEPTH = 5;
 
             int[] colorArray = new int[10];
             float[] mixtureAmount = new float[10];
@@ -144,7 +144,7 @@ namespace TestWritable.engine
             }
 
             // Compute the sine of the transmitted angle using Snell's law
-            float sinT = etaI / etaT * (float)Math.Sqrt(Math.Max(0.0f, 1.0f - cosI * cosI));
+            float sinT = etaI / etaT * MathF.Sqrt(Math.Max(0.0f, 1.0f - cosI * cosI));
 
             // Check for total internal reflection
             if (sinT >= 1.0f)
@@ -153,7 +153,7 @@ namespace TestWritable.engine
             }
             else
             {
-                float cosT = (float)Math.Sqrt(Math.Max(0.0f, 1.0f - sinT * sinT));
+                float cosT = MathF.Sqrt(Math.Max(0.0f, 1.0f - sinT * sinT));
                 cosI = Math.Abs(cosI);
                 float Rs = ((etaT * cosI) - (etaI * cosT)) / ((etaT * cosI) + (etaI * cosT));
                 float Rp = ((etaI * cosI) - (etaT * cosT)) / ((etaI * cosI) + (etaT * cosT));

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using static TestWritable.structs.StructExt;
 
 namespace TestWritable.structs.material
 {
@@ -16,12 +17,13 @@ namespace TestWritable.structs.material
 
         public Vector3 Min;
         public Vector3 Max;
-
         public ColorStruct Color;
 
         public float Luminance;
         public float Reflectivity;
         public float Fresnel;
+
+        private int structType;
 
         public RectangleStruct(Vector3 pos1, 
                                Vector3 pos2, 
@@ -50,6 +52,7 @@ namespace TestWritable.structs.material
                 Math.Max(pos1.Y, pos2.Y),
                 Math.Max(pos1.Z, pos2.Z)
             );
+            this.structType = (int)StructType.Rectangle;
         }
 
         // Assuming TracerObject is not an interface, remove 'override' and adjust method signatures if necessary
@@ -76,9 +79,9 @@ namespace TestWritable.structs.material
                 if (t < tMax && t > tMin)
                 {
                     Vector3 hitPoint = r.PointAtParameter(t);
-                    hitPoint.X = (float)Math.Round(hitPoint.X * 1000) / 1000;
-                    hitPoint.Y = (float)Math.Round(hitPoint.Y * 1000) / 1000;
-                    hitPoint.Z = (float)Math.Round(hitPoint.Z * 1000) / 1000;
+                    hitPoint.X = MathF.Round(hitPoint.X * 1000) / 1000f;
+                    hitPoint.Y = MathF.Round(hitPoint.Y * 1000) / 1000f;
+                    hitPoint.Z = MathF.Round(hitPoint.Z * 1000) / 1000f;
 
                     // Use precomputed Min and Max for hit detection
                     if (hitPoint.X >= Min.X && hitPoint.X <= Max.X &&
@@ -102,31 +105,31 @@ namespace TestWritable.structs.material
         {
             return new float[]
             {
-            Center.X,
-            Center.Y,
-            Center.Z,
+                structType,
 
-            Normal.X,
-            Normal.Y,
-            Normal.Z,
+                Color.R,
+                Color.G,
+                Color.B,
 
-            Min.X,
-            Min.Y,
-            Min.Z,
+                Luminance,
+                Reflectivity,
+                Fresnel,
 
-            Max.X,
-            Max.Y,
-            Max.Z,
+                Center.X,
+                Center.Y,
+                Center.Z,
 
-            Color.R,
-            Color.G,
-            Color.B,
+                Normal.X,
+                Normal.Y,
+                Normal.Z,
 
-            Luminance,
-            Reflectivity,
-            Fresnel,
+                Min.X,
+                Min.Y,
+                Min.Z,
 
-            -123123123 // use -123123123 as end key
+                Max.X,
+                Max.Y,
+                Max.Z,
             };
         }
 
@@ -141,39 +144,41 @@ namespace TestWritable.structs.material
         {
             var rectangle = new RectangleStruct
             {
+                structType = (int)arr[readFrom + IndexConstants.StructType],
+                Color = ColorStruct.FromRGB((int)arr[readFrom + IndexConstants.ColorR],
+                                            (int)arr[readFrom + IndexConstants.ColorG],
+                                            (int)arr[readFrom + IndexConstants.ColorB]),
+                Luminance = arr[readFrom + IndexConstants.Luminance],
+                Reflectivity = arr[readFrom + IndexConstants.Reflectivity],
+                Fresnel = arr[readFrom + IndexConstants.Fresnel],
+
                 Center = new Vector3
                 {
-                    X = arr[readFrom + 0],
-                    Y = arr[readFrom + 1],
-                    Z = arr[readFrom + 2]
+                    X = arr[readFrom + 7],
+                    Y = arr[readFrom + 8],
+                    Z = arr[readFrom + 9]
                 },
 
                 Normal = new Vector3
                 {
-                    X = arr[readFrom + 3],
-                    Y = arr[readFrom + 4],
-                    Z = arr[readFrom + 5]
+                    X = arr[readFrom + 10],
+                    Y = arr[readFrom + 11],
+                    Z = arr[readFrom + 12]
                 },
 
                 Min = new Vector3
                 {
-                    X = arr[readFrom + 6],
-                    Y = arr[readFrom + 7],
-                    Z = arr[readFrom + 8]
+                    X = arr[readFrom + 13],
+                    Y = arr[readFrom + 14],
+                    Z = arr[readFrom + 15]
                 },
 
                 Max = new Vector3
                 {
-                    X = arr[readFrom + 9],
-                    Y = arr[readFrom + 10],
-                    Z = arr[readFrom + 11]
+                    X = arr[readFrom + 16],
+                    Y = arr[readFrom + 17],
+                    Z = arr[readFrom + 18]
                 },
-
-                Color = ColorStruct.FromRGB((int)arr[readFrom + 12], (int)arr[readFrom + 13], (int)arr[readFrom + 14]),
-
-                Luminance = arr[readFrom + 15],
-                Reflectivity = arr[readFrom + 16],
-                Fresnel = arr[readFrom + 17]
             };
 
             return rectangle;

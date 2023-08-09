@@ -81,19 +81,22 @@ namespace TestWritable.structs
             return new float[]
             {
                 structType,
-                Center.X,
-                Center.Y,
-                Center.Z,
-                Normal.X,
-                Normal.Y,
-                Normal.Z,
+
                 Color.R,
                 Color.G,
                 Color.B,
+
                 Luminance,
                 Reflectivity,
                 Fresnel,
-                -123123123 // use -123123123 as end key
+
+                Center.X,
+                Center.Y,
+                Center.Z,
+
+                Normal.X,
+                Normal.Y,
+                Normal.Z,
             };
         }
 
@@ -108,23 +111,27 @@ namespace TestWritable.structs
         {
             var plane = new PlaneStruct
             {
-                structType = (int)arr[readFrom], // Read structType from the specified index
+
+                structType = (int)arr[readFrom + IndexConstants.StructType],
+                Color = ColorStruct.FromRGB((int)arr[readFrom + IndexConstants.ColorR],
+                                            (int)arr[readFrom + IndexConstants.ColorG],
+                                            (int)arr[readFrom + IndexConstants.ColorB]),
+                Luminance = arr[readFrom + IndexConstants.Luminance],
+                Reflectivity = arr[readFrom + IndexConstants.Reflectivity],
+                Fresnel = arr[readFrom + IndexConstants.Fresnel],
+
                 Center = new Vector3
                 {
-                    X = arr[readFrom + 1],
-                    Y = arr[readFrom + 2],
-                    Z = arr[readFrom + 3]
+                    X = arr[readFrom + 7],
+                    Y = arr[readFrom + 8],
+                    Z = arr[readFrom + 9]
                 },
                 Normal = new Vector3
                 {
-                    X = arr[readFrom + 4],
-                    Y = arr[readFrom + 5],
-                    Z = arr[readFrom + 6]
+                    X = arr[readFrom + 10],
+                    Y = arr[readFrom + 11],
+                    Z = arr[readFrom + 12]
                 },
-                Color = ColorStruct.FromRGB((int)arr[readFrom + 7], (int)arr[readFrom + 8], (int)arr[readFrom + 9]),
-                Luminance = arr[readFrom + 10],
-                Reflectivity = arr[readFrom + 11],
-                Fresnel = arr[readFrom + 12]
             };
 
             return plane;
