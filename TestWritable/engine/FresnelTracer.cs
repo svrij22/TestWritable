@@ -48,7 +48,7 @@ namespace TestWritable.engine
             if (hitObject.GetFresnel() > 0)
                 reflectionCoefficient = FresnelReflection(ray.Direction, normal, ior) * hitObject.GetFresnel();
             reflectionCoefficient += hitObject.GetReflectivity();
-            reflectionCoefficient = Math.Clamp(reflectionCoefficient, 0, 1);
+            reflectionCoefficient = IntrinsicMath.Clamp(reflectionCoefficient, 0, 1);
             return reflectionCoefficient;
         }
         public static int Trace(RayStruct ray, ArrayView<float> structData)
@@ -109,10 +109,10 @@ namespace TestWritable.engine
             }
 
             // Start with the last color
-            int resultColor = colorArray[colorArray.Count() - 1];
+            int resultColor = colorArray[colorArray.Length - 1];
 
             // Work our way to the start
-            for (int i = colorArray.Count() - 2; i >= 0; i--)
+            for (int i = colorArray.Length - 2; i >= 0; i--)
             {
                 resultColor = Ext.MixColors(resultColor, colorArray[i], mixtureAmount[i]);
             }
@@ -208,7 +208,7 @@ namespace TestWritable.engine
                 }
             }
 
-            diffuseLightIntensity = Math.Clamp(diffuseLightIntensity, 0, 1);
+            diffuseLightIntensity = IntrinsicMath.Clamp(diffuseLightIntensity, 0, 1);
 
             var col = hitObject.GetColor();
             var red = (int)(col.R * diffuseLightIntensity);
