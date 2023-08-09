@@ -19,158 +19,52 @@ namespace TestWritable.structs
             this.floatData = floatData;
             this.readFrom = readFrom;
         }
-
-        /// <summary>
-        /// Is glass
-        /// </summary>
         public bool IsGlass()
         {
-            if (floatData[readFrom] == (float)StructType.Sphere)
-            {
-                SphereStruct sStruct = SphereStruct.Decode(floatData, readFrom);
-                return sStruct.IsGlass;
-            }
-
-            //Failure
+            if (floatData[readFrom] == (float)StructType.Sphere) return SphereStruct.Decode(floatData, readFrom).IsGlass;
             return false;
         }
-
-
-        /// <summary>
-        /// Hit switch
-        /// </summary>
         public float GetLuminance()
         {
-            if (floatData[readFrom] == (float)StructType.Sphere)
-            {
-                SphereStruct sStruct = SphereStruct.Decode(floatData, readFrom);
-                return sStruct.Luminance;
-            }
-            if (floatData[readFrom] == (float)StructType.Plane)
-            {
-                PlaneStruct pStruct = PlaneStruct.Decode(floatData, readFrom);
-                return pStruct.Luminance;
-            }
-
-            //Failure
+            if (floatData[readFrom] == (float)StructType.Sphere) return SphereStruct.Decode(floatData, readFrom).Luminance;
+            if (floatData[readFrom] == (float)StructType.Plane) return PlaneStruct.Decode(floatData, readFrom).Luminance;
             return 0;
         }
-        /// <summary>
-        /// Hit switch
-        /// </summary>
         public float GetFresnel()
         {
-            if (floatData[readFrom] == (float)StructType.Sphere)
-            {
-                SphereStruct sStruct = SphereStruct.Decode(floatData, readFrom);
-                return sStruct.Fresnel;
-            }
-            if (floatData[readFrom] == (float)StructType.Plane)
-            {
-                PlaneStruct pStruct = PlaneStruct.Decode(floatData, readFrom);
-                return pStruct.Fresnel;
-            }
-
-            //Failure
+            if (floatData[readFrom] == (float)StructType.Sphere) return SphereStruct.Decode(floatData, readFrom).Fresnel;
+            if (floatData[readFrom] == (float)StructType.Plane) return PlaneStruct.Decode(floatData, readFrom).Fresnel;
             return 0;
         }
-
-
-        /// <summary>
-        /// Hit switch
-        /// </summary>
         public float GetReflectivity()
         {
-            if (floatData[readFrom] == (float)StructType.Sphere)
-            {
-                SphereStruct sStruct = SphereStruct.Decode(floatData, readFrom);
-                return sStruct.Reflectivity;
-            }
-            if (floatData[readFrom] == (float)StructType.Plane)
-            {
-                PlaneStruct pStruct = PlaneStruct.Decode(floatData, readFrom);
-                return pStruct.Reflectivity;
-            }
-
-            //Failure
+            if (floatData[readFrom] == (float)StructType.Sphere) return SphereStruct.Decode(floatData, readFrom).Reflectivity;
+            if (floatData[readFrom] == (float)StructType.Plane) return PlaneStruct.Decode(floatData, readFrom).Reflectivity;
             return 0;
         }
-
-        /// <summary>
-        /// Hit switch
-        /// </summary>
         public ColorStruct GetColor()
         {
-            if (floatData[readFrom] == (float)StructType.Sphere)
-            {
-                SphereStruct sStruct = SphereStruct.Decode(floatData, readFrom);
-                return sStruct.Color;
-            }
-            if (floatData[readFrom] == (float)StructType.Plane)
-            {
-                PlaneStruct pStruct = PlaneStruct.Decode(floatData, readFrom);
-                return pStruct.Color;
-            }
-
-            //Failure
+            if (floatData[readFrom] == (float)StructType.Sphere) return SphereStruct.Decode(floatData, readFrom).Color;
+            if (floatData[readFrom] == (float)StructType.Plane) return PlaneStruct.Decode(floatData, readFrom).Color;
             return new ColorStruct();
         }
-
-        /// <summary>
-        /// Hit switch
-        /// </summary>
         public Vector3 NormalAt(Vector3 point)
         {
-            if (floatData[readFrom] == (float)StructType.Sphere)
-            {
-                SphereStruct sStruct = SphereStruct.Decode(floatData, readFrom);
-                return sStruct.NormalAt(point);
-            }
-            if (floatData[readFrom] == (float)StructType.Plane)
-            {
-                PlaneStruct pStruct = PlaneStruct.Decode(floatData, readFrom);
-                return pStruct.NormalAt(point);
-            }
-
-            //Failure
+            if (floatData[readFrom] == (float)StructType.Sphere) return SphereStruct.Decode(floatData, readFrom).NormalAt(point);
+            if (floatData[readFrom] == (float)StructType.Plane) return PlaneStruct.Decode(floatData, readFrom).NormalAt(point);
             return new Vector3();
         }
-
-        /// <summary>
-        /// Hit switch
-        /// </summary>
         public bool Hit(RayStruct r, float tMin, float tMax, out float t)
         {
-            if (floatData[readFrom] == (float)StructType.Sphere)
-            {
-                SphereStruct sStruct = SphereStruct.Decode(floatData, readFrom);
-                return sStruct.Hit(r, tMin, tMax, out t);
-            }
-            if (floatData[readFrom] == (float)StructType.Plane)
-            {
-                PlaneStruct pStruct = PlaneStruct.Decode(floatData, readFrom);
-                return pStruct.Hit(r, tMin, tMax, out t);
-            }
-
-            //Failure
+            if (floatData[readFrom] == (float)StructType.Sphere) return SphereStruct.Decode(floatData, readFrom).Hit(r, tMin, tMax, out t);
+            if (floatData[readFrom] == (float)StructType.Plane) return PlaneStruct.Decode(floatData, readFrom).Hit(r, tMin, tMax, out t);
             t = 0;
             return false;
         }
-
         internal Vector3 GetCenter()
         {
-            if (floatData[readFrom] == (float)StructType.Sphere)
-            {
-                SphereStruct sStruct = SphereStruct.Decode(floatData, readFrom);
-                return sStruct.Center;
-            }
-            if (floatData[readFrom] == (float)StructType.Plane)
-            {
-                PlaneStruct pStruct = PlaneStruct.Decode(floatData, readFrom);
-                return pStruct.Center;
-            }
-
-            //Failure
+            if (floatData[readFrom] == (float)StructType.Sphere) return SphereStruct.Decode(floatData, readFrom).Center;
+            if (floatData[readFrom] == (float)StructType.Plane) return PlaneStruct.Decode(floatData, readFrom).Center;
             return new();
         }
     }
