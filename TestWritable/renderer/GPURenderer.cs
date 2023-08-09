@@ -22,8 +22,7 @@ namespace TestWritable
     internal class GPURenderer
     {
         private WriteableBitmap writeableBitmap;
-
-        public Vector3 Origin { get; set; }
+        public Vector3 Origin = new(0, 0, 4);
         public GPURenderer(WriteableBitmap writeableBitmap, double Width, double Height)
         {
             this.writeableBitmap = writeableBitmap;
@@ -35,7 +34,8 @@ namespace TestWritable
             Compile();
             Compute();
         }
-        public static void RendererKernel(Index1D pixelIndex, 
+        public static void RendererKernel(Index1D pixelIndex,
+                           Vector3 origin,
                            int _width, 
                            int _height, 
                            ArrayView<float> structData, 
@@ -46,22 +46,21 @@ namespace TestWritable
             int img_y = pixelIndex / _width;
 
             //Setup
-            Vector3 Origin = new(0, 0, 4);
             double AspectRatio = _width / (float)_height;
             float ViewportHeight = 2.0f;
             double ViewportWidth = AspectRatio * ViewportHeight;
             float FocalLength = 1.0f;
             Vector3 horizontal = new Vector3((float)ViewportWidth, 0, 0);
             Vector3 vertical = new Vector3(0, ViewportHeight, 0);
-            Vector3 lowerLeftCorner = Origin - horizontal / 2 - vertical / 2 - new Vector3(0, 0, FocalLength);
+            Vector3 lowerLeftCorner = origin - horizontal / 2 - vertical / 2 - new Vector3(0, 0, FocalLength);
 
             //get u and v
             float u = (float)(img_x / (((float)_width) - 1));
             float v = (float)(img_y / (((float)_height) - 1));
 
             // Pointing each ray towards a point on the viewport
-            var direction = lowerLeftCorner + Ext.MultiplyVectorByScalar(horizontal, u) + Ext.MultiplyVectorByScalar(vertical, v) - Origin;
-            var ray = new RayStruct(Origin, Vector3.Normalize(direction));
+            var direction = lowerLeftCorner + Ext.MultiplyVectorByScalar(horizontal, u) + Ext.MultiplyVectorByScalar(vertical, v) - origin;
+            var ray = new RayStruct(origin, Vector3.Normalize(direction));
 
             // Get color
             int color_data = GlassTracer.Trace(ray, structData);
@@ -98,7 +97,7 @@ namespace TestWritable
             context.Dispose();
         }
 
-        Action<Index1D, int, int, ArrayView<float>, ArrayView<int>> loadedKernel;
+        Action<Index1D, Vector3, int, int, ArrayView<float>, ArrayView<int>> loadedKernel;
         MemoryBuffer1D<int, Stride1D.Dense> pixelsOutput;
         MemoryBuffer1D<float, Stride1D.Dense> structData;
         public void Compile()
@@ -115,7 +114,7 @@ namespace TestWritable
             //
             // Load / Compile
             //
-            loadedKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, int, int, ArrayView<float>, ArrayView<int>>(RendererKernel);
+            loadedKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, Vector3, int, int, ArrayView<float>, ArrayView<int>>(RendererKernel);
 
         }
 
@@ -129,7 +128,7 @@ namespace TestWritable
             stopwatch.Start(); // Start measuring time
             Debug.WriteLine("render started");
 
-            loadedKernel((int)pixelsOutput.Length, (int)width, (int)height, structData.View, pixelsOutput.View);
+            loadedKernel((int)pixelsOutput.Length, Origin, (int)width, (int)height, structData.View, pixelsOutput.View);
 
             // wait for the accelerator to be finished with whatever it's doing
             // in this case it just waits for the kernel to finish.

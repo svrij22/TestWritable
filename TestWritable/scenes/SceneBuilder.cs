@@ -30,7 +30,7 @@ namespace TestWritable.scenes
             foreach (var sphere in spheres) objectStructs.AddRange(StructExt.EncodeToBlock(sphere.Encode()));
 
             // Input plane
-            var plane1 = new PlaneStruct(new Vector3(0, .5f, 0), new Vector3(0, -1, 0), .1f, 0f, 1f, 125, 125, 125);
+            var plane1 = new PlaneStruct(new Vector3(0, .5f, 0), new Vector3(0, -1, 0), .15f, .04f, .3f, Color.WhiteSmoke.R, Color.WhiteSmoke.G, Color.WhiteSmoke.B);
             objectStructs.AddRange(StructExt.EncodeToBlock(plane1.Encode()));
 
             // Input rectangles
