@@ -51,7 +51,7 @@ namespace TestWritable.engine
             reflectionCoefficient = IntrinsicMath.Clamp(reflectionCoefficient, 0, 1);
             return reflectionCoefficient;
         }
-        public static int Trace(RayStruct ray, ArrayView<float> structData)
+        public static int Trace(RayStruct ray, ArrayView<float> structData, ArrayView<double> randData, int pixelIndex)
         {
             const int MAX_DEPTH = 5;
 

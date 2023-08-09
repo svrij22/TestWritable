@@ -39,6 +39,7 @@ namespace TestWritable
                            int _width, 
                            int _height, 
                            ArrayView<float> structData, 
+                           ArrayView<double> randData,
                            ArrayView<int> output)
         {
             //Pixel indices
@@ -63,7 +64,7 @@ namespace TestWritable
             var ray = new RayStruct(origin, Vector3.Normalize(direction));
 
             // Get color
-            int color_data = GlassTracer.Trace(ray, structData);
+            int color_data = GlassTracer.Trace(ray, structData, randData, pixelIndex);
 
             //Set output
             output[pixelIndex] = color_data;
@@ -97,13 +98,21 @@ namespace TestWritable
             context.Dispose();
         }
 
-        Action<Index1D, Vector3, int, int, ArrayView<float>, ArrayView<int>> loadedKernel;
+        Action<Index1D, Vector3, int, int, ArrayView<float>, ArrayView<double>, ArrayView<int>> loadedKernel;
         MemoryBuffer1D<int, Stride1D.Dense> pixelsOutput;
         MemoryBuffer1D<float, Stride1D.Dense> structData;
+        MemoryBuffer1D<double, Stride1D.Dense> randData;
         public void Compile()
         {
             var struct_floats = SceneBuilder.Scene1();
             structData = accelerator.Allocate1D<float>(struct_floats.ToArray());
+
+            //Write random doubles
+            Random random = new Random();
+            double[] rnd = new double[4096];
+            for (int i = 0; i < 4096; i++)
+                rnd[i] = random.NextDouble();
+            randData = accelerator.Allocate1D<double>(rnd.ToArray());
 
             //
             // Output pixels
@@ -114,7 +123,7 @@ namespace TestWritable
             //
             // Load / Compile
             //
-            loadedKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, Vector3, int, int, ArrayView<float>, ArrayView<int>>(RendererKernel);
+            loadedKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, Vector3, int, int, ArrayView<float>, ArrayView<double>, ArrayView<int>>(RendererKernel);
 
         }
 
@@ -128,7 +137,7 @@ namespace TestWritable
             stopwatch.Start(); // Start measuring time
             Debug.WriteLine("render started");
 
-            loadedKernel((int)pixelsOutput.Length, Origin, (int)width, (int)height, structData.View, pixelsOutput.View);
+            loadedKernel((int)pixelsOutput.Length, Origin, (int)width, (int)height, structData.View, randData.View, pixelsOutput.View);
 
             // wait for the accelerator to be finished with whatever it's doing
             // in this case it just waits for the kernel to finish.

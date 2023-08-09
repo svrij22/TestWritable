@@ -191,13 +191,8 @@ namespace TestWritable.structs
         /// <summary>
         /// Random points
         /// </summary>
-        public Vector3 GetRandomPoint()
+        public Vector3 GetRandomPoint(double rand1, double rand2)
         {
-            /*double rand1 = random.NextDouble();
-            double rand2 = random.NextDouble();
-            if (rand1 == 0)
-                random = new Random();
-
             float theta = (float)(rand1 * 2d * Math.PI);    // Random value between [0, 2π]
             float phi = (float)(Math.Acos(2 * rand2 - 1d)); // Random value between [0, π]
 
@@ -205,9 +200,7 @@ namespace TestWritable.structs
             float y = (float)(Radius * Math.Sin(phi) * Math.Sin(theta));
             float z = (float)(Radius * Math.Cos(phi));
 
-            return new Vector3(Center.X + x, Center.Y + y, Center.Z + z);*/
-
-            return Center;
+            return new Vector3(Center.X + x, Center.Y + y, Center.Z + z);
         }
     }
 }
