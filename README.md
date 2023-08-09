@@ -16,4 +16,8 @@ Stress test
 150 orbs
 ![image](https://github.com/svrij22/TestWritable/assets/49317209/bc21658e-a1dd-4e76-b840-73c39f556807)
 
+2 light sources
+![image](https://github.com/svrij22/TestWritable/assets/49317209/06072aa7-1bf2-4ada-85bd-73c0dc904175)
+
+
 Binnen 72 uur geprogrammeerd als uitstel gedrag voor stage!
