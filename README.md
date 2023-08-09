@@ -1,6 +1,6 @@
 Simple raytracer in C#
 
-![image](https://github.com/svrij22/TestWritable/assets/49317209/f353a114-ad11-45a1-91be-b74efae32a55)
+![image](https://github.com/svrij22/TestWritable/assets/49317209/736bcf16-5bff-406b-8f59-a808c8f75d30)
 
 With bloom / gaussian blur, glass material
 
