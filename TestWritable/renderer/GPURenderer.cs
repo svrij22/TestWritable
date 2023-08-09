@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using TestWritable.blur;
 using TestWritable.engine;
 using TestWritable.renderer;
 using TestWritable.scenes;
@@ -98,33 +99,44 @@ namespace TestWritable
             context.Dispose();
         }
 
-        Action<Index1D, Vector3, int, int, ArrayView<float>, ArrayView<double>, ArrayView<int>> loadedKernel;
+        Action<Index1D, Vector3, int, int, ArrayView<float>, ArrayView<double>, ArrayView<int>> rendererKernel;
+        Action<Index1D, int, int, ArrayView<int>, ArrayView<float>> brightPixelsKernel;
+
         MemoryBuffer1D<int, Stride1D.Dense> pixelsOutput;
+        MemoryBuffer1D<int, Stride1D.Dense> brightPixelsOutput;
         MemoryBuffer1D<float, Stride1D.Dense> structData;
         MemoryBuffer1D<double, Stride1D.Dense> randData;
-        public void Compile()
-        {
-            var struct_floats = SceneBuilder.Scene1();
-            structData = accelerator.Allocate1D<float>(struct_floats.ToArray());
 
+        public void ResetRandomData()
+        {
             //Write random doubles
             Random random = new Random();
             double[] rnd = new double[2500];
             for (int i = 0; i < 2500; i++)
                 rnd[i] = random.NextDouble();
             randData = accelerator.Allocate1D<double>(rnd.ToArray());
+        }
+        public void Compile()
+        {
+            var struct_floats = SceneBuilder.Scene1();
+            structData = accelerator.Allocate1D<float>(struct_floats.ToArray());
 
             //
             // Output pixels
             //
             int amountOfPixels = (int)(width * height);
             pixelsOutput = accelerator.Allocate1D<int>(amountOfPixels);
+            brightPixelsOutput = accelerator.Allocate1D<int>(amountOfPixels);
 
             //
-            // Load / Compile
+            // Load / Compile renderer kernel
             //
-            loadedKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, Vector3, int, int, ArrayView<float>, ArrayView<double>, ArrayView<int>>(RendererKernel);
+            rendererKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, Vector3, int, int, ArrayView<float>, ArrayView<double>, ArrayView<int>>(RendererKernel);
 
+            //
+            // Load / Compile bright pixels kernel
+            //
+            brightPixelsKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, int, int, ArrayView<int>, ArrayView<float>>(Blur.GetBrightPixelsKernel);
         }
 
         public int[] PixelBuffer = null;
@@ -135,33 +147,9 @@ namespace TestWritable
             PixelBuffer = null;
             FramesComputed = 0;
         }
-        public void Compute()
+
+        public void CombineWithPixelBuffer(int[] hostOutput)
         {
-            //
-            // Compute
-            //
-
-            // Start measuring time
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            //Write random doubles
-            Random random = new Random();
-            double[] rnd = new double[2500];
-            for (int i = 0; i < 2500; i++)
-                rnd[i] = random.NextDouble();
-            randData = accelerator.Allocate1D<double>(rnd.ToArray());
-
-            //Run kernel
-            loadedKernel((int)pixelsOutput.Length, Origin, (int)width, (int)height, structData.View, randData.View, pixelsOutput.View);
-
-            // wait for the accelerator to be finished with whatever it's doing
-            // in this case it just waits for the kernel to finish.
-            accelerator.Synchronize();
-
-            // moved output data from the GPU to the CPU for output to console
-            int[] hostOutput = pixelsOutput.GetAsArray1D();
-
             // Overlay
             if (PixelBuffer == null)
             {
@@ -178,7 +166,36 @@ namespace TestWritable
                     }
                 }
             }
+        }
+        public void Compute()
+        {
+            //
+            // Compute
+            //
+
+            // Start measuring time
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            // Write random doubles
+            ResetRandomData();
+
+            // Run kernel
+            rendererKernel((int)pixelsOutput.Length, Origin, (int)width, (int)height, structData.View, randData.View, pixelsOutput.View);
+
+            // Sync
+            accelerator.Synchronize();
+
+            // Write to buffer
+            int[] hostOutput = pixelsOutput.GetAsArray1D();
+            CombineWithPixelBuffer(hostOutput);
             FramesComputed++;
+
+            // Run bright pixels kernel
+            //brightPixelsKernel((int)pixelsOutput.Length, (int)width, (int)height, "", brightPixelsOutput.View);
+
+            // Sync
+            accelerator.Synchronize();
 
             //Write
             stopwatch.Stop();

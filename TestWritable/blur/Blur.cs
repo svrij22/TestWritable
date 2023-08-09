@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ILGPU;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -179,6 +180,24 @@ namespace TestWritable.blur
         }
 
 
+        /// <summary>
+        /// Bright pixels kernel
+        /// </summary>
+        /// <param name="pixelIndex"></param>
+        /// <param name="_width"></param>
+        /// <param name="_height"></param>
+        /// <param name="input"></param>
+        /// <param name="output"></param>
+        public static void GetBrightPixelsKernel(Index1D pixelIndex,
+                                                 int _width,
+                                                 int _height,
+                                                 ArrayView<int> input,
+                                                 ArrayView<float> output) {
+
+            //Pixel indices
+            float intensity = Ext.GetIntensity(input[pixelIndex]); // Define this function to extract intensity from your color.
+            output[pixelIndex] = intensity;
+        }
         public float[,] GetBrightPixels(int[,] colorData, int width, int height)
         {
             // Corona effect (bloom)
