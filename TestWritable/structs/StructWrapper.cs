@@ -14,7 +14,7 @@ namespace TestWritable.structs
     public struct StructWrapper
     {
         public ArrayView<float> floatData;
-        private readonly int readFrom;
+        public readonly int readFrom;
         public StructWrapper(ArrayView<float> floatData, int readFrom)
         {
             this.floatData = floatData;

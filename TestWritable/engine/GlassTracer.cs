@@ -245,7 +245,7 @@ namespace TestWritable.engine
                 if (lumin > .2f)
                 {
                     //Cast 8 rays
-                    int numSoftShadowRays = 8;
+                    int numSoftShadowRays = 30;
                     int numShadowHits = 0;
                     for (int i2 = 0; i2 < numSoftShadowRays; i2++)
                     {
@@ -267,11 +267,11 @@ namespace TestWritable.engine
                         for (int i3 = 0; i3 < StructExt.AmountOfObjects(structData); i3++)
                         {
                             //Base lumin
-                            var objs_obj = StructExt.DecodeStruct(structData, i3);
-                            if (objs_obj.GetCenter() != light_obj.GetCenter() &&
-                                objs_obj.GetCenter() != hitObject.GetCenter()
-                                && !objs_obj.IsGlass() 
-                                && objs_obj.Hit(shadowRay, 0.001f, 5.0f, out _))
+                            var blocking_obj = StructExt.DecodeStruct(structData, i3);
+                            if (blocking_obj.readFrom != light_obj.readFrom &&
+                                blocking_obj.readFrom != hitObject.readFrom
+                                && !blocking_obj.IsGlass() 
+                                && blocking_obj.Hit(shadowRay, 0.001f, 5.0f, out _))
                             {
                                 inShadow = true;
                                 break;
