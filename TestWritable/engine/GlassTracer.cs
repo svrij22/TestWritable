@@ -245,20 +245,21 @@ namespace TestWritable.engine
                 if (lumin > .2f)
                 {
                     //Cast 8 rays
-                    int numSoftShadowRays = 30;
+                    int numSoftShadowRays = 1;
                     int numShadowHits = 0;
                     for (int i2 = 0; i2 < numSoftShadowRays; i2++)
                     {
                         //Generate random 
-                        double rand1 = RandomExt.GetRandom(randData, (doublePointer * 32));
-                        doublePointer++;
+                        //double rand1 = RandomExt.GetRandom(randData, (doublePointer * 32));
+                        //doublePointer++;
 
                         //Generate random 
-                        double rand2 = RandomExt.GetRandom(randData, (doublePointer * 32));
-                        doublePointer++;
+                        //double rand2 = RandomExt.GetRandom(randData, (doublePointer * 32));
+                        //doublePointer++;
 
                         //Point to random object on light
-                        Vector3 randomPointOnLight = light_obj.GetRandomPoint(rand1, rand2); // Assuming your TracerObject can provide a random point on its surface
+                        //Vector3 randomPointOnLight = light_obj.GetRandomPoint(rand1, rand2); // Assuming your TracerObject can provide a random point on its surface
+                        Vector3 randomPointOnLight = light_obj.GetCenter(); // Assuming your TracerObject can provide a random point on its surface
                         Vector3 lightDir = Vector3.Normalize(randomPointOnLight - hitPoint);
                         RayStruct shadowRay = new RayStruct(hitPoint, lightDir);
 
