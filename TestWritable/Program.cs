@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -11,6 +8,11 @@ using System.Numerics;
 using System;
 using System.Timers;
 using System.Windows.Threading;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using System.Threading;
+using Timer = System.Threading.Timer;
+using TestWritable.renderer;
 
 namespace TestWritable
 {
@@ -20,6 +22,7 @@ namespace TestWritable
         static Window w;
         static Image i;
         static GPURenderer renderer;
+        static FPSBitmapWriter bitmapFPSWriter;
 
         [STAThread]
         static void Main(string[] args)
@@ -54,23 +57,59 @@ namespace TestWritable
             Application app = new Application();
 
             renderer = new GPURenderer(writeableBitmap, w.Width, w.Height);
+            bitmapFPSWriter = new FPSBitmapWriter(writeableBitmap);
 
-            StartTimer();
+            StartGPUTimer();
+            StartCounterTimer();
+            StartWriterTimer();
+
             app.Run();
         }
 
-        private static void StartTimer()
+        private static Timer _timer;
+        private static DispatcherTimer _secondTimer;
+        private static int _fpsCounter = 0;
+        private static int _lastFps = 0;
+        private static long _gpuRenderSpeed = 0;
+        private static void StartCounterTimer()
         {
-            DispatcherTimer _timer;
-            _timer = new DispatcherTimer();
-            _timer.Interval = TimeSpan.FromMilliseconds(10);
-            _timer.Tick += (s, e) =>
+            _secondTimer = new DispatcherTimer();
+            _secondTimer.Interval = TimeSpan.FromSeconds(1);
+            _secondTimer.Tick += (s, e) =>
             {
-                _timer.Stop();
-                TimerTick();
-                _timer.Start();
+                Debug.WriteLine($"Executions per second: {_fpsCounter}");
+                _lastFps = _fpsCounter;
+                _fpsCounter = 0;
             };
-            _timer.Start();
+            _secondTimer.Start();
+        }
+        private static void StartGPUTimer()
+        {
+            Task.Run(() =>
+            {
+                try
+                {
+                    while (true)
+                    {
+                        _gpuRenderSpeed = renderer.Compute();
+                        _fpsCounter++;
+                    }
+                }catch(Exception ex)
+                {
+                    Debug.WriteLine(ex.ToString());
+                }
+            });
+        }
+        private static void StartWriterTimer()
+        {
+            _secondTimer = new DispatcherTimer();
+            _secondTimer.Interval = TimeSpan.FromMilliseconds(12);
+            _secondTimer.Tick += (s, e) =>
+            {
+                TimerTick();
+                bitmapFPSWriter.WriteFPS($"{_lastFps}fps - {_gpuRenderSpeed}ms");
+            };
+            _secondTimer.Start();
         }
 
         const float Speed = 1.3f;
@@ -100,7 +139,21 @@ namespace TestWritable
                 renderer.Origin = new Vector3(renderer.Origin.X, renderer.Origin.Y, renderer.Origin.Z + Speed);
                 renderer.ResetPixelBuffer();
             }
-            renderer.Compute();
+
+            if (Keyboard.IsKeyDown(Key.Q))
+            {
+                // Move backward
+                renderer.Origin = new Vector3(renderer.Origin.X, renderer.Origin.Y - Speed, renderer.Origin.Z);
+                renderer.ResetPixelBuffer();
+            }
+
+            if (Keyboard.IsKeyDown(Key.E))
+            {
+                // Move backward
+                renderer.Origin = new Vector3(renderer.Origin.X, renderer.Origin.Y + Speed, renderer.Origin.Z + Speed);
+                renderer.ResetPixelBuffer();
+            }
+            renderer.WriteToBitmap();
         }
 
         private static void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)

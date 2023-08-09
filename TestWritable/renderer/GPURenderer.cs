@@ -125,6 +125,7 @@ namespace TestWritable
             // Output pixels
             //
             int amountOfPixels = (int)(width * height);
+            PixelBuffer = new int[amountOfPixels];
             pixelsOutput = accelerator.Allocate1D<int>(amountOfPixels);
             brightPixelsOutput = accelerator.Allocate1D<int>(amountOfPixels);
 
@@ -141,33 +142,35 @@ namespace TestWritable
 
         public int[] PixelBuffer = null;
 
-        public int FramesComputed = 0;
+        public int FramesComputed = 1;
+
+        public bool ResetFlag = false;
         public void ResetPixelBuffer()
         {
-            PixelBuffer = null;
             FramesComputed = 0;
+            ResetFlag = true;
         }
 
         public void CombineWithPixelBuffer(int[] hostOutput)
         {
-            // Overlay
-            if (PixelBuffer == null)
+            if (ResetFlag)
             {
-                PixelBuffer = hostOutput;
+                FramesComputed = 0;
+                PixelBuffer = hostOutput.ToArray();
+                ResetFlag = false;
+                return;
             }
-            else
+
+            for (int i = 0; i < hostOutput.Length; i++)
             {
-                for (int i = 0; i < hostOutput.Length; i++)
+                if (hostOutput[i] != PixelBuffer[i])
                 {
-                    if (hostOutput[i] != PixelBuffer[i])
-                    {
-                        var nWeight = 1f / FramesComputed;
-                        PixelBuffer[i] = Ext.MixColors(hostOutput[i], PixelBuffer[i], nWeight);
-                    }
+                    var nWeight = 1f / FramesComputed;
+                    PixelBuffer[i] = Ext.MixColors(hostOutput[i], PixelBuffer[i], nWeight);
                 }
             }
         }
-        public void Compute()
+        public long Compute()
         {
             //
             // Compute
@@ -200,6 +203,14 @@ namespace TestWritable
             //Write
             stopwatch.Stop();
             Debug.WriteLine($"Execution Time: {stopwatch.ElapsedMilliseconds} ms");
+
+            return stopwatch.ElapsedMilliseconds;
+        }
+
+        public void WriteToBitmap()
+        {
+            if (PixelBuffer == null)
+                return;
 
             //Write to bitmap
             BitmapWriter.Write(writeableBitmap, (int)width, (int)height, PixelBuffer);

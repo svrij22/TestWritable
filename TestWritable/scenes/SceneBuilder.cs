@@ -49,7 +49,63 @@ namespace TestWritable.scenes
             };
             foreach (var rectangle in rectangles) objectStructs.AddRange(StructExt.EncodeToBlock(rectangle.Encode()));
 
+
+            //Generate random spheres
+            GenerateSpheresWithMinDistance(50, 1.5f, 12f).ForEach(sph =>
+            {
+                objectStructs.AddRange(StructExt.EncodeToBlock(sph.Encode()));
+            });
             return objectStructs.ToArray();
+        }
+
+        public static List<SphereStruct> GenerateSpheresWithMinDistance(int numberOfSpheres, float minDistance, float range)
+        {
+            List<SphereStruct> generatedSpheres = new List<SphereStruct>();
+            Random rand = new Random();
+
+            // Boundaries for generating spheres; adjust as needed.
+            float roomMinX = -range;
+            float roomMaxX = range;
+            float roomMinZ = -range;
+            float roomMaxZ = range;
+
+            while (generatedSpheres.Count < numberOfSpheres)
+            {
+                // Generate random X and Z coordinates within the room boundaries.
+                float x = (float)(rand.NextDouble() * (roomMaxX - roomMinX) + roomMinX);
+                float z = (float)(rand.NextDouble() * (roomMaxZ - roomMinZ) + roomMinZ);
+
+                Vector3 newCenter = new Vector3(x, 0, z);
+
+                bool isTooClose = false;
+
+                foreach (var sphere in generatedSpheres)
+                {
+                    // Check the distance between the new center and existing spheres.
+                    if (Vector3.Distance(newCenter, sphere.Center) < minDistance)
+                    {
+                        isTooClose = true;
+                        break;
+                    }
+                }
+
+                if (!isTooClose)
+                {
+                    // Randomize the properties for the sphere.
+                    float radius = .5f; // Adjust the range if needed
+                    float luminance = .1f; // 0.0f to 1.0f
+                    float reflectivity = (float)rand.NextDouble(); // 0.0f to 1.0f
+                    float fresnel = (float)rand.NextDouble(); // 0.0f to 1.0f
+                    int _r = rand.Next(256); // 0 to 255
+                    int _g = rand.Next(256); // 0 to 255
+                    int _b = rand.Next(256); // 0 to 255
+                    bool isGlass = rand.Next(4) == 0; // Random true or false
+
+                    generatedSpheres.Add(new SphereStruct(newCenter, radius, luminance, reflectivity, fresnel, _r, _g, _b, isGlass));
+                }
+            }
+
+            return generatedSpheres;
         }
     }
 }
