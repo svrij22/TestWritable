@@ -46,7 +46,7 @@ namespace TestWritable
             int img_y = pixelIndex / _width;
 
             //Setup
-            Vector3 Origin = new(0, 0, 0);
+            Vector3 Origin = new(0, 0, 4);
             double AspectRatio = _width / (float)_height;
             float ViewportHeight = 2.0f;
             double ViewportWidth = AspectRatio * ViewportHeight;
