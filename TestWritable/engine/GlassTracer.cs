@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using TestWritable.ext;
 using TestWritable.structs;
 
 namespace TestWritable.engine
@@ -116,7 +117,9 @@ namespace TestWritable.engine
                     }
 
                     // Calculate the diffuse colour
-                    int diffuseColour = GetDiffuseColour(hitObject, structData, hitPoint, normal);
+                    int diffuseColour = GetDiffuseColour(hitObject, structData, randData, pixelIndex, hitPoint, normal);
+
+                    //Set col
                     colorArray[depth] = diffuseColour;  //Write down current diffuse colour
                     mixtureAmount[depth] = reflectionCoefficient;
 
@@ -230,18 +233,63 @@ namespace TestWritable.engine
         /// <returns></returns>
 
         public static Random random = new Random();
-        private static int GetDiffuseColour(StructWrapper hitObject, ArrayView<float> structData, Vector3 hitPoint, Vector3 normal)
+        private static int GetDiffuseColour(StructWrapper hitObject, ArrayView<float> structData, ArrayView<double> randData, int doublePointer, Vector3 hitPoint, Vector3 normal)
         {
-
             //Base light intensity is ambient light
             var diffuseLightIntensity = hitObject.GetLuminance(); //Ambient
             for (int i = 0; i < StructExt.AmountOfObjects(structData); i++)
             {
-                var obj = StructExt.DecodeStruct(structData, i);
-                var lumin = obj.GetLuminance();
+                //Base lumin
+                var light_obj = StructExt.DecodeStruct(structData, i);
+                var lumin = light_obj.GetLuminance();
                 if (lumin > .2f)
                 {
-                    diffuseLightIntensity += obj.GetLuminance() * Math.Max(0, Vector3.Dot(Vector3.Normalize(obj.GetCenter() - hitPoint), normal));
+                    //Cast 8 rays
+                    int numSoftShadowRays = 8;
+                    int numShadowHits = 0;
+                    for (int i2 = 0; i2 < numSoftShadowRays; i2++)
+                    {
+                        //Generate random 
+                        double rand1 = RandomExt.GetRandom(randData, (doublePointer * 8));
+                        doublePointer++;
+
+                        //Generate random 
+                        double rand2 = RandomExt.GetRandom(randData, (doublePointer * 8));
+                        doublePointer++;
+
+                        //Point to random object on light
+                        Vector3 randomPointOnLight = light_obj.GetRandomPoint(rand1, rand2); // Assuming your TracerObject can provide a random point on its surface
+                        Vector3 lightDir = Vector3.Normalize(randomPointOnLight - hitPoint);
+                        RayStruct shadowRay = new RayStruct(hitPoint, lightDir);
+
+                        //Check if ray is in shadow
+                        bool inShadow = false;
+                        for (int i3 = 0; i3 < StructExt.AmountOfObjects(structData); i3++)
+                        {
+                            //Base lumin
+                            var objs_obj = StructExt.DecodeStruct(structData, i3);
+                            if (objs_obj.GetCenter() != light_obj.GetCenter() &&
+                                objs_obj.GetCenter() != hitObject.GetCenter()
+                                && !objs_obj.IsGlass() 
+                                && objs_obj.Hit(shadowRay, 0.001f, 5.0f, out _))
+                            {
+                                inShadow = true;
+                                break;
+                            }
+                        }
+
+                        //Shadow hits
+                        if (inShadow)
+                            numShadowHits++;
+
+                        //Skip if x times consequetively zero
+                        if (numShadowHits == 0 && i == (numSoftShadowRays / 2))
+                            i = numSoftShadowRays;
+                    }
+
+                    //Calculate shadow factor
+                    float shadowFactor = 1.0f - (float)numShadowHits / numSoftShadowRays;
+                    diffuseLightIntensity += light_obj.GetLuminance() * shadowFactor * Math.Max(0, Vector3.Dot(Vector3.Normalize(light_obj.GetCenter() - hitPoint), normal));
                 }
             }
 
@@ -251,6 +299,7 @@ namespace TestWritable.engine
             var red = (int)(col.R * diffuseLightIntensity);
             var green = (int)(col.G * diffuseLightIntensity);
             var blue = (int)(col.B * diffuseLightIntensity);
+
             return Ext.RGBToColorInt(red, green, blue);
         }
     }

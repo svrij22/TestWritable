@@ -61,9 +61,16 @@ namespace TestWritable.structs
         }
         internal Vector3 GetCenter()
         {
-            if (floatData[readFrom] == (float)StructType.Sphere) return SphereStruct.Decode(floatData, readFrom).Center;
-            if (floatData[readFrom] == (float)StructType.Plane) return PlaneStruct.Decode(floatData, readFrom).Center;
-            if (floatData[readFrom] == (float)StructType.Rectangle) return PlaneStruct.Decode(floatData, readFrom).Center;
+            return new Vector3
+            {
+                X = floatData[readFrom + IndexConstants.CenterX],
+                Y = floatData[readFrom + IndexConstants.CenterY],
+                Z = floatData[readFrom + IndexConstants.CenterZ]
+            };
+        }
+        internal Vector3 GetRandomPoint(double rand1, double rand2)
+        {
+            if (floatData[readFrom] == (float)StructType.Sphere) return SphereStruct.Decode(floatData, readFrom).GetRandomPoint(rand1, rand2);
             return new();
         }
     }

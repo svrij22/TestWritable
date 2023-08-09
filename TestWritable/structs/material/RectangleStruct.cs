@@ -151,14 +151,12 @@ namespace TestWritable.structs.material
                 Luminance = arr[readFrom + IndexConstants.Luminance],
                 Reflectivity = arr[readFrom + IndexConstants.Reflectivity],
                 Fresnel = arr[readFrom + IndexConstants.Fresnel],
-
                 Center = new Vector3
                 {
-                    X = arr[readFrom + 7],
-                    Y = arr[readFrom + 8],
-                    Z = arr[readFrom + 9]
+                    X = arr[readFrom + IndexConstants.CenterX],
+                    Y = arr[readFrom + IndexConstants.CenterY],
+                    Z = arr[readFrom + IndexConstants.CenterZ]
                 },
-
                 Normal = new Vector3
                 {
                     X = arr[readFrom + 10],

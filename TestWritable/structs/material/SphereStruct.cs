@@ -22,10 +22,11 @@ namespace TestWritable.structs
         public const int Reflectivity = 5;
         public const int Fresnel = 6;
 
-        public const int Radius = 4;
-        public const int CenterX = 5;
-        public const int CenterY = 6;
-        public const int CenterZ = 7;
+        public const int CenterX = 7;
+        public const int CenterY = 8;
+        public const int CenterZ = 9;
+        public const int Radius = 10;
+
         public const int IsGlass = 11;
     }
     public struct SphereStruct
@@ -95,10 +96,10 @@ namespace TestWritable.structs
                 Reflectivity,
                 Fresnel,
 
-                Radius,
                 Center.X,
                 Center.Y,
                 Center.Z,
+                Radius,
                 IsGlass ? 1 : 0,
             };
         }
@@ -120,14 +121,13 @@ namespace TestWritable.structs
                 Luminance = arr[readFrom + IndexConstants.Luminance],
                 Reflectivity = arr[readFrom + IndexConstants.Reflectivity],
                 Fresnel = arr[readFrom + IndexConstants.Fresnel],
-
-                Radius = arr[readFrom + 7],
                 Center = new Vector3
                 {
-                    X = arr[readFrom + 8],
-                    Y = arr[readFrom + 9],
-                    Z = arr[readFrom + 10]
+                    X = arr[readFrom + IndexConstants.CenterX],
+                    Y = arr[readFrom + IndexConstants.CenterY],
+                    Z = arr[readFrom + IndexConstants.CenterZ]
                 },
+                Radius = arr[readFrom + 10],
                 IsGlass = arr[readFrom + 11] == 1 ? true : false,
             };
 
@@ -193,14 +193,9 @@ namespace TestWritable.structs
         /// </summary>
         public Vector3 GetRandomPoint(double rand1, double rand2)
         {
-            float theta = (float)(rand1 * 2d * Math.PI);    // Random value between [0, 2π]
-            float phi = (float)(Math.Acos(2 * rand2 - 1d)); // Random value between [0, π]
-
-            float x = (float)(Radius * Math.Sin(phi) * Math.Cos(theta));
-            float y = (float)(Radius * Math.Sin(phi) * Math.Sin(theta));
-            float z = (float)(Radius * Math.Cos(phi));
-
-            return new Vector3(Center.X + x, Center.Y + y, Center.Z + z);
+            return Center + Vector3.Normalize(new Vector3((float)rand1 - .5f,
+                                                (float)rand2 - .5f,
+                                                (float)rand1 - .5f));
         }
     }
 }
