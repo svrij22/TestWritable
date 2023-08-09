@@ -7,3 +7,7 @@ Simple raytracer in C#
 With bloom / gaussian blur, glass material
 
 ![image](https://github.com/svrij22/TestWritable/assets/49317209/bd0b459c-bc7a-4a15-8959-cda8a0355f71)
+
+GPU acceleration
+
+![image](https://github.com/svrij22/TestWritable/assets/49317209/e39a2efe-58e2-4692-a36f-8e99aa7f259b)
