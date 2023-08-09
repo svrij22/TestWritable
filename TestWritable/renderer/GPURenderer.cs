@@ -109,8 +109,8 @@ namespace TestWritable
 
             //Write random doubles
             Random random = new Random();
-            double[] rnd = new double[40960];
-            for (int i = 0; i < 40960; i++)
+            double[] rnd = new double[2500];
+            for (int i = 0; i < 2500; i++)
                 rnd[i] = random.NextDouble();
             randData = accelerator.Allocate1D<double>(rnd.ToArray());
 
@@ -127,16 +127,32 @@ namespace TestWritable
 
         }
 
+        public int[] PixelBuffer = null;
+
+        public int FramesComputed = 0;
+        public void ResetPixelBuffer()
+        {
+            PixelBuffer = null;
+            FramesComputed = 0;
+        }
         public void Compute()
         {
             //
             // Compute
             //
 
+            // Start measuring time
             Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start(); // Start measuring time
-            Debug.WriteLine("render started");
+            stopwatch.Start();
 
+            //Write random doubles
+            Random random = new Random();
+            double[] rnd = new double[2500];
+            for (int i = 0; i < 2500; i++)
+                rnd[i] = random.NextDouble();
+            randData = accelerator.Allocate1D<double>(rnd.ToArray());
+
+            //Run kernel
             loadedKernel((int)pixelsOutput.Length, Origin, (int)width, (int)height, structData.View, randData.View, pixelsOutput.View);
 
             // wait for the accelerator to be finished with whatever it's doing
@@ -146,13 +162,30 @@ namespace TestWritable
             // moved output data from the GPU to the CPU for output to console
             int[] hostOutput = pixelsOutput.GetAsArray1D();
 
+            // Overlay
+            if (PixelBuffer == null)
+            {
+                PixelBuffer = hostOutput;
+            }
+            else
+            {
+                for (int i = 0; i < hostOutput.Length; i++)
+                {
+                    if (hostOutput[i] != PixelBuffer[i])
+                    {
+                        var nWeight = 1f / FramesComputed;
+                        PixelBuffer[i] = Ext.MixColors(hostOutput[i], PixelBuffer[i], nWeight);
+                    }
+                }
+            }
+            FramesComputed++;
+
             //Write
-            Debug.WriteLine("render finished");
-            stopwatch.Stop(); // Stop measuring time
+            stopwatch.Stop();
             Debug.WriteLine($"Execution Time: {stopwatch.ElapsedMilliseconds} ms");
 
             //Write to bitmap
-            BitmapWriter.Write(writeableBitmap, (int)width, (int)height, hostOutput);
+            BitmapWriter.Write(writeableBitmap, (int)width, (int)height, PixelBuffer);
         }
     }
 }

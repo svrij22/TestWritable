@@ -8,6 +8,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Input;
 using System.Numerics;
+using System;
+using System.Timers;
+using System.Windows.Threading;
 
 namespace TestWritable
 {
@@ -27,7 +30,7 @@ namespace TestWritable
 
             w = new Window();
             w.Height = 800;
-            w.Width = 1300;
+            w.Width = 800;
             w.Content = i;
             w.Show();
             w.Closing += W_Closing;
@@ -46,64 +49,63 @@ namespace TestWritable
             i.HorizontalAlignment = HorizontalAlignment.Left;
             i.VerticalAlignment = VerticalAlignment.Top;
 
-            i.MouseRightButtonDown +=
-                new MouseButtonEventHandler(i_MouseRightButtonDown);
-            i.MouseLeftButtonDown +=
-                new MouseButtonEventHandler(i_MouseLeftButtonDown);
-
             w.MouseWheel += new MouseWheelEventHandler(w_MouseWheel);
-
-            w.KeyDown += W_KeyDown;
 
             Application app = new Application();
 
             renderer = new GPURenderer(writeableBitmap, w.Width, w.Height);
 
+            StartTimer();
             app.Run();
         }
+
+        private static void StartTimer()
+        {
+            DispatcherTimer _timer;
+            _timer = new DispatcherTimer();
+            _timer.Interval = TimeSpan.FromMilliseconds(10);
+            _timer.Tick += (s, e) =>
+            {
+                _timer.Stop();
+                TimerTick();
+                _timer.Start();
+            };
+            _timer.Start();
+        }
+
+        const float Speed = 1.3f;
+        public static void TimerTick()
+        {
+            if (Keyboard.IsKeyDown(Key.A))
+            {
+                // Move left
+                renderer.Origin = new Vector3(renderer.Origin.X - Speed, renderer.Origin.Y, renderer.Origin.Z);
+                renderer.ResetPixelBuffer();
+            }
+            if (Keyboard.IsKeyDown(Key.D))
+            {
+                // Move right
+                renderer.Origin = new Vector3(renderer.Origin.X + Speed, renderer.Origin.Y, renderer.Origin.Z);
+                renderer.ResetPixelBuffer();
+            }
+            if (Keyboard.IsKeyDown(Key.W))
+            {
+                // Move forward
+                renderer.Origin = new Vector3(renderer.Origin.X, renderer.Origin.Y, renderer.Origin.Z - Speed);
+                renderer.ResetPixelBuffer();
+            }
+            if (Keyboard.IsKeyDown(Key.S))
+            {
+                // Move backward
+                renderer.Origin = new Vector3(renderer.Origin.X, renderer.Origin.Y, renderer.Origin.Z + Speed);
+                renderer.ResetPixelBuffer();
+            }
+            renderer.Compute();
+        }
+
         private static void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             renderer.Dispose();
-        }
-
-        private static void W_KeyDown(object sender, KeyEventArgs e)
-        {
-            const float Speed = 1.3f;
-
-            switch (e.Key)
-            {
-                case Key.A:
-                    // Move left
-                    renderer.Origin = new Vector3(renderer.Origin.X - Speed,    renderer.Origin.Y,          renderer.Origin.Z);
-                    break;
-                case Key.D:
-                    // Move right
-                    renderer.Origin = new Vector3(renderer.Origin.X + Speed,    renderer.Origin.Y,          renderer.Origin.Z);
-                    break;
-                case Key.W:
-                    // Move left
-                    renderer.Origin = new Vector3(renderer.Origin.X,            renderer.Origin.Y ,         renderer.Origin.Z - Speed);
-                    break;
-                case Key.S:
-                    // Move right
-                    renderer.Origin = new Vector3(renderer.Origin.X,            renderer.Origin.Y ,         renderer.Origin.Z + Speed);
-                    break;
-            }
-
-            // Assuming you have a Render method to redraw the scene
-            renderer.Compute();
-        }
-
-        static void i_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            renderer.Compute();
-        }
-
-        static void i_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            int column = (int)e.GetPosition(i).X;
-            int row = (int)e.GetPosition(i).Y;
-            //scene.TracePoint(column, row);
         }
 
         static void w_MouseWheel(object sender, MouseWheelEventArgs e)

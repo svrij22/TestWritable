@@ -191,11 +191,19 @@ namespace TestWritable.structs
         /// <summary>
         /// Random points
         /// </summary>
-        public Vector3 GetRandomPoint(double rand1, double rand2)
+        public Vector3 GetRandomPoint(double rand1, double rand2, double rand3)
         {
-            return Center + Vector3.Normalize(new Vector3((float)rand1 - .5f,
-                                                (float)rand2 - .5f,
-                                                (float)rand1 - .5f));
+            Vector3 point;
+
+            do
+            {
+                point = new Vector3((float)rand1 * 2 - 1,
+                                    (float)rand2 * 2 - 1,
+                                    (float)rand3 * 2 - 1);
+            }
+            while (point.LengthSquared() > 1.0f || point.LengthSquared() < 0.01f); // This ensures we aren't taking points from the center or outside the unit sphere.
+
+            return Center + Vector3.Normalize(point) * Radius;
         }
     }
 }

@@ -101,6 +101,8 @@ namespace TestWritable.engine
                             ni_over_nt = 1.0f / ior;
                             reflectProb = FresnelReflection(ray.Direction, -normal, ior);
                         }
+
+                        //Lerp probability
                         static float Lerp(float a, float b, float t)
                         {
                             return (1 - t) * a + t * b;
@@ -108,11 +110,21 @@ namespace TestWritable.engine
                         reflectProb = Lerp(reflectProb, 0.5f, 0.1f);
 
                         //Calculate refraction
-                        Refract(ray.Direction, outwardNormal, ni_over_nt, out refracted);
-                        RayStruct refractedRay = new RayStruct(hitPoint, refracted);
-                        ray = refractedRay;
-                        colorArray[depth] = 0xFFFFFF;
-                        mixtureAmount[depth] = 1;
+                        if (reflectProb < .5f)
+                        {
+                            Refract(ray.Direction, outwardNormal, ni_over_nt, out refracted);
+                            RayStruct refractedRay = new RayStruct(hitPoint, refracted);
+                            ray = refractedRay;
+                            colorArray[depth] = 0xFFFFFF;
+                            mixtureAmount[depth] = 1;
+                        }
+                        else
+                        {
+                            RayStruct reflectedRay = new RayStruct(hitPoint, reflected);
+                            ray = reflectedRay;
+                            colorArray[depth] = 0xFFFFFF;
+                            mixtureAmount[depth] = 1;
+                        }
                         continue;
                     }
 
@@ -250,16 +262,20 @@ namespace TestWritable.engine
                     for (int i2 = 0; i2 < numSoftShadowRays; i2++)
                     {
                         //Generate random 
-                        //double rand1 = RandomExt.GetRandom(randData, (doublePointer * 32));
-                        //doublePointer++;
+                        double rand1 = RandomExt.GetRandom(randData, doublePointer);
+                        doublePointer++;
 
                         //Generate random 
-                        //double rand2 = RandomExt.GetRandom(randData, (doublePointer * 32));
-                        //doublePointer++;
+                        double rand2 = RandomExt.GetRandom(randData, doublePointer);
+                        doublePointer++;
+
+                        //Generate random 
+                        double rand3 = RandomExt.GetRandom(randData, doublePointer);
+                        doublePointer++;
 
                         //Point to random object on light
-                        //Vector3 randomPointOnLight = light_obj.GetRandomPoint(rand1, rand2); // Assuming your TracerObject can provide a random point on its surface
-                        Vector3 randomPointOnLight = light_obj.GetCenter(); // Assuming your TracerObject can provide a random point on its surface
+                        Vector3 randomPointOnLight = light_obj.GetRandomPoint(rand1, rand2, rand3); // Assuming your TracerObject can provide a random point on its surface
+                        //Vector3 randomPointOnLight = light_obj.GetCenter(); // Assuming your TracerObject can provide a random point on its surface
                         Vector3 lightDir = Vector3.Normalize(randomPointOnLight - hitPoint);
                         RayStruct shadowRay = new RayStruct(hitPoint, lightDir);
 

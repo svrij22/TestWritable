@@ -68,9 +68,9 @@ namespace TestWritable.structs
                 Z = floatData[readFrom + IndexConstants.CenterZ]
             };
         }
-        internal Vector3 GetRandomPoint(double rand1, double rand2)
+        internal Vector3 GetRandomPoint(double rand1, double rand2, double rand3)
         {
-            if (floatData[readFrom] == (float)StructType.Sphere) return SphereStruct.Decode(floatData, readFrom).GetRandomPoint(rand1, rand2);
+            if (floatData[readFrom] == (float)StructType.Sphere) return SphereStruct.Decode(floatData, readFrom).GetRandomPoint(rand1, rand2, rand3);
             return new();
         }
     }
