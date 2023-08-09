@@ -11,7 +11,7 @@ using static TestWritable.TracerObject;
 
 namespace TestWritable
 {
-    internal class RayTracer
+    public struct RayTracer
     {
         /// <summary>
         /// Eerst alles opdelen in methoden
