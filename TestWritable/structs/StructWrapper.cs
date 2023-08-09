@@ -35,6 +35,47 @@ namespace TestWritable.structs
             return false;
         }
 
+
+        /// <summary>
+        /// Hit switch
+        /// </summary>
+        public float GetLuminance()
+        {
+            if (floatData[readFrom] == (float)StructType.Sphere)
+            {
+                SphereStruct sStruct = SphereStruct.Decode(floatData, readFrom);
+                return sStruct.Luminance;
+            }
+            if (floatData[readFrom] == (float)StructType.Plane)
+            {
+                PlaneStruct pStruct = PlaneStruct.Decode(floatData, readFrom);
+                return pStruct.Luminance;
+            }
+
+            //Failure
+            return 0;
+        }
+        /// <summary>
+        /// Hit switch
+        /// </summary>
+        public float GetFresnel()
+        {
+            if (floatData[readFrom] == (float)StructType.Sphere)
+            {
+                SphereStruct sStruct = SphereStruct.Decode(floatData, readFrom);
+                return sStruct.Fresnel;
+            }
+            if (floatData[readFrom] == (float)StructType.Plane)
+            {
+                PlaneStruct pStruct = PlaneStruct.Decode(floatData, readFrom);
+                return pStruct.Fresnel;
+            }
+
+            //Failure
+            return 0;
+        }
+
+
         /// <summary>
         /// Hit switch
         /// </summary>
@@ -114,6 +155,23 @@ namespace TestWritable.structs
             //Failure
             t = 0;
             return false;
+        }
+
+        internal Vector3 GetCenter()
+        {
+            if (floatData[readFrom] == (float)StructType.Sphere)
+            {
+                SphereStruct sStruct = SphereStruct.Decode(floatData, readFrom);
+                return sStruct.Center;
+            }
+            if (floatData[readFrom] == (float)StructType.Plane)
+            {
+                PlaneStruct pStruct = PlaneStruct.Decode(floatData, readFrom);
+                return pStruct.Center;
+            }
+
+            //Failure
+            return new();
         }
     }
 }
