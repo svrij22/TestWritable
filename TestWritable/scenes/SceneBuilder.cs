@@ -25,7 +25,7 @@ namespace TestWritable.scenes
                 new SphereStruct(new Vector3(1.5f, 0, -2), 0.5f, .3f, 0f, .3f, Color.Green.R, Color.Green.G, Color.Green.B),
                 new SphereStruct(new Vector3(2.5f, 0, 0), 0.5f, .1f, 0f, .3f, Color.Pink.R, Color.Pink.G, Color.Pink.B, true),
 
-                new SphereStruct(new Vector3(0, -3, -2), 0.5f, 1f, 0f, 0f, Color.White.R, Color.White.G, Color.White.B)
+                new SphereStruct(new Vector3(0, -12, -2), 1f, 1f, 0f, 0f, Color.White.R, Color.White.G, Color.White.B)
             };
             foreach (var sphere in spheres) objectStructs.AddRange(StructExt.EncodeToBlock(sphere.Encode()));
 
