@@ -72,7 +72,7 @@ namespace TestWritable.engine
                     // Depth tracing for bounced rays
                     // Base properties
                     Vector3 hitPoint = ray.PointAtParameter(dist);
-                    Vector3 normal = hitObject.NormalAt(hitPoint);
+                    Vector3 normal = hitObject.NormalAt(hitPoint, ray);
 
                     //index of refraction
                     float ior = 1.5f; // Replace with the refractive index of the material

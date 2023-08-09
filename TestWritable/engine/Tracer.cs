@@ -40,7 +40,7 @@ namespace TestWritable.engine
                 if (hasHit)
                 {
                     Vector3 hitPoint = ray.Origin + ray.Direction * closest;
-                    var normal = hitObject.NormalAt(hitPoint);
+                    var normal = hitObject.NormalAt(hitPoint, ray);
 
                     // Calculate direction from hitPoint to light source
                     Vector3 toLight = lightPosition - hitPoint;

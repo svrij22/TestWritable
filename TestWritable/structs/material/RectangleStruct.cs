@@ -76,9 +76,9 @@ namespace TestWritable.structs.material
                 if (t < tMax && t > tMin)
                 {
                     Vector3 hitPoint = r.PointAtParameter(t);
-                    hitPoint.X = (float)Math.Round(hitPoint.X, 3);
-                    hitPoint.Y = (float)Math.Round(hitPoint.Y, 3);
-                    hitPoint.Z = (float)Math.Round(hitPoint.Z, 3);
+                    hitPoint.X = (float)Math.Round(hitPoint.X * 1000) / 1000;
+                    hitPoint.Y = (float)Math.Round(hitPoint.Y * 1000) / 1000;
+                    hitPoint.Z = (float)Math.Round(hitPoint.Z * 1000) / 1000;
 
                     // Use precomputed Min and Max for hit detection
                     if (hitPoint.X >= Min.X && hitPoint.X <= Max.X &&
