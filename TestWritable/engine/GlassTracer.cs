@@ -76,7 +76,7 @@ namespace TestWritable.engine
                     Vector3 normal = hitObject.NormalAt(hitPoint, ray);
 
                     //index of refraction
-                    float ior = 1.5f; // Replace with the refractive index of the material
+                    float ior = 1.3f; // Replace with the refractive index of the material
                     float reflectionCoefficient = ReflectionCoEfficient(ray, hitObject, normal, ior);
 
 

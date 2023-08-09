@@ -27,10 +27,8 @@ namespace TestWritable
         public GPURenderer(WriteableBitmap writeableBitmap, double Width, double Height)
         {
             this.writeableBitmap = writeableBitmap;
-
             width = Width;
             height = Height;
-
             Initialize();
             Compile();
             Compute();
@@ -72,8 +70,15 @@ namespace TestWritable
         }
 
         //Width and height
-        private readonly double width;
-        private readonly double height;
+        private double width;
+        private double height;
+        public void Update(WriteableBitmap writeableBitmap, double width, double height)
+        {
+            this.writeableBitmap = writeableBitmap;
+            this.width = width;
+            this.height = height;
+            SetBufferSize();
+        }
 
         /// <summary>
         /// Test method for gpu acceleration
@@ -111,16 +116,14 @@ namespace TestWritable
         {
             //Write random doubles
             Random random = new Random();
-            double[] rnd = new double[2500];
-            for (int i = 0; i < 2500; i++)
+            double[] rnd = new double[50000];
+            for (int i = 0; i < 50000; i++)
                 rnd[i] = random.NextDouble();
             randData = accelerator.Allocate1D<double>(rnd.ToArray());
         }
-        public void Compile()
-        {
-            var struct_floats = SceneBuilder.Scene1();
-            structData = accelerator.Allocate1D<float>(struct_floats.ToArray());
 
+        public void SetBufferSize()
+        {
             //
             // Output pixels
             //
@@ -128,6 +131,14 @@ namespace TestWritable
             PixelBuffer = new int[amountOfPixels];
             pixelsOutput = accelerator.Allocate1D<int>(amountOfPixels);
             brightPixelsOutput = accelerator.Allocate1D<int>(amountOfPixels);
+        }
+
+        public void Compile()
+        {
+            var struct_floats = SceneBuilder.Scene1();
+            structData = accelerator.Allocate1D<float>(struct_floats.ToArray());
+
+            SetBufferSize();
 
             //
             // Load / Compile renderer kernel

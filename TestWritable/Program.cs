@@ -37,6 +37,7 @@ namespace TestWritable
             w.Content = i;
             w.Show();
             w.Closing += W_Closing;
+            w.SizeChanged += W_SizeChanged;
 
             writeableBitmap = new WriteableBitmap(
                 (int)w.ActualWidth,
@@ -60,60 +61,113 @@ namespace TestWritable
             bitmapFPSWriter = new FPSBitmapWriter(writeableBitmap);
 
             StartGPUTimer();
-            StartCounterTimer();
+            StartFPSTimer();
             StartWriterTimer();
 
             app.Run();
         }
 
-        private static Timer _timer;
-        private static DispatcherTimer _secondTimer;
+        public static bool isAwaitingInvoke = false;
+        private static void W_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (!isAwaitingInvoke)
+            {
+                isAwaitingInvoke = true;
+                Dispatcher.CurrentDispatcher.Invoke(async () =>
+                {
+                    await Task.Delay(100);
+
+                    _calcFpsTimer.Stop();
+                    _writeFpsTimer.Stop();
+                    _gpuComputeTaskPaused = true;
+
+                    await Task.Delay(100);
+
+                    writeableBitmap = new WriteableBitmap(
+                        (int)w.ActualWidth,
+                        (int)w.ActualHeight,
+                        96,
+                        96,
+                        PixelFormats.Bgr32,
+                        null);
+
+                    i.Source = writeableBitmap;
+
+                    bitmapFPSWriter = new FPSBitmapWriter(writeableBitmap);
+                    renderer.Update(writeableBitmap, w.Width, w.Height);
+
+                    _gpuComputeTaskPaused = false;
+                    StartFPSTimer();
+                    StartWriterTimer();
+
+                    isAwaitingInvoke = false;
+                });
+            }
+        }
+
+        private static DispatcherTimer _calcFpsTimer;
+        private static DispatcherTimer _writeFpsTimer;
+
         private static int _fpsCounter = 0;
         private static int _lastFps = 0;
         private static long _gpuRenderSpeed = 0;
-        private static void StartCounterTimer()
+        private static void StartFPSTimer()
         {
-            _secondTimer = new DispatcherTimer();
-            _secondTimer.Interval = TimeSpan.FromSeconds(1);
-            _secondTimer.Tick += (s, e) =>
+            _calcFpsTimer = new DispatcherTimer();
+            _calcFpsTimer.Interval = TimeSpan.FromSeconds(1);
+            _calcFpsTimer.Tick += (s, e) =>
             {
                 Debug.WriteLine($"Executions per second: {_fpsCounter}");
                 _lastFps = _fpsCounter;
                 _fpsCounter = 0;
             };
-            _secondTimer.Start();
+            _calcFpsTimer.Start();
         }
+
+        public static Task _gpuComputeTask;
+        public static bool _gpuComputeTaskPaused = false;
         private static void StartGPUTimer()
         {
-            Task.Run(() =>
+            _gpuComputeTask = Task.Run(() =>
             {
                 try
                 {
                     while (true)
                     {
-                        _gpuRenderSpeed = renderer.Compute();
-                        _fpsCounter++;
+                        if (!_gpuComputeTaskPaused)
+                        {
+                            _gpuRenderSpeed = renderer.Compute();
+                            _fpsCounter++;
+                            Thread.Sleep(1);
+                        }
+                        else
+                        {
+                            Thread.Sleep(100);
+                        }
                     }
-                }catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Debug.WriteLine(ex.ToString());
+                    Thread.Sleep(100);
+                    StartGPUTimer();
                 }
             });
         }
         private static void StartWriterTimer()
         {
-            _secondTimer = new DispatcherTimer();
-            _secondTimer.Interval = TimeSpan.FromMilliseconds(12);
-            _secondTimer.Tick += (s, e) =>
+            _writeFpsTimer = new DispatcherTimer();
+            _writeFpsTimer.Interval = TimeSpan.FromMilliseconds(12);
+            _writeFpsTimer.Tick += (s, e) =>
             {
-                TimerTick();
+                WriteTick();
                 bitmapFPSWriter.WriteFPS($"{_lastFps}fps - {_gpuRenderSpeed}ms");
             };
-            _secondTimer.Start();
+            _writeFpsTimer.Start();
         }
 
         const float Speed = 1.3f;
-        public static void TimerTick()
+        public static void WriteTick()
         {
             if (Keyboard.IsKeyDown(Key.A))
             {
@@ -153,7 +207,11 @@ namespace TestWritable
                 renderer.Origin = new Vector3(renderer.Origin.X, renderer.Origin.Y + Speed, renderer.Origin.Z + Speed);
                 renderer.ResetPixelBuffer();
             }
-            renderer.WriteToBitmap();
+            try
+            {
+                renderer.WriteToBitmap();
+            }
+            catch (Exception ex) { Debug.WriteLine("Write exception"); }
         }
 
         private static void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
