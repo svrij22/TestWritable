@@ -26,8 +26,8 @@ namespace TestWritable
             RenderOptions.SetEdgeMode(i, EdgeMode.Aliased);
 
             w = new Window();
-            w.Height = 123;
-            w.Width = 123;
+            w.Height = 500;
+            w.Width = 800;
             w.Content = i;
             w.Show();
             w.Closing += W_Closing;
@@ -58,7 +58,6 @@ namespace TestWritable
             Application app = new Application();
 
             renderer = new GPURenderer(writeableBitmap, w.Width, w.Height);
-            renderer.Compute();
 
             app.Run();
         }

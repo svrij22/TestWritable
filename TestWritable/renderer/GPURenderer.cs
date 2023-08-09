@@ -87,7 +87,7 @@ namespace TestWritable
             //accelerator = context.GetPreferredDevice(preferCPU: true).CreateAccelerator(context);
 
             context = Context.CreateDefault();
-            accelerator = context.GetPreferredDevice(preferCPU: true)
+            accelerator = context.GetPreferredDevice(preferCPU: false)
                 .CreateAccelerator(context);
         }
 
