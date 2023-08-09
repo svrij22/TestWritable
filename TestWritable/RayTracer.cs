@@ -22,75 +22,101 @@ namespace TestWritable
         /// <param name="objects"></param>
         /// <param name="depth"></param>
         /// <returns></returns>
-        public static int Trace(Ray ray, List<TracerObject> objects, int depth = 0)
+        /// 
+        public static void Hit(Ray ray, List<TracerObject> objects, out TracerObject hitObject, out float dist)
         {
-            const int MAX_DEPTH = 4;
-
             //Gets the closest object
-            float closest = float.MaxValue;
-            TracerObject hitObject = null;
+            dist = float.MaxValue;
+            hitObject = null;
             foreach (var obj in objects)
             {
-                if (obj.Hit(ray, 0.001f, float.MaxValue, out var dist)) // tMin set to small positive number to prevent self-intersection
+                if (obj.Hit(ray, 0.001f, float.MaxValue, out var d)) // tMin set to small positive number to prevent self-intersection
                 {
-                    if (dist < closest)
+                    if (d < dist)
                     {
-                        closest = dist;
+                        dist = d;
                         hitObject = obj;
                     }
                 }
             }
+        }
+        public static float ReflectionCoEfficient(Ray ray, TracerObject hitObject, Vector3 normal, float ior = 1.5f)
+        {
+            // Fresnel reflection coefficient
+            float reflectionCoefficient = 0f;
+            if (hitObject.Fresnel > 0)
+                reflectionCoefficient = FresnelReflection(ray.Direction, normal, ior) * hitObject.Fresnel;
+            reflectionCoefficient += hitObject.Reflectivity;
+            reflectionCoefficient = Math.Clamp(reflectionCoefficient, 0, 1);
+            return reflectionCoefficient;
+        }
+        public static int Trace(Ray ray, List<TracerObject> objects)
+        {
+            const int MAX_DEPTH = 4;
 
-            // If it hits an object, return the object's color
-            if (hitObject != null)
+            int[] colorArray = new int[10];
+            float[] mixtureAmount = new float[10];
+
+            for(int depth = 0; depth < MAX_DEPTH; depth++)
             {
-                // Depth tracing for bounced rays
-                if (depth < MAX_DEPTH)
+                //Do hit
+                float dist;
+                TracerObject hitObject;
+                Hit(ray, objects, out hitObject, out dist);
+
+                // If it hits an object, return the object's color
+                if (hitObject != null)
                 {
+                    // Depth tracing for bounced rays
                     // Base properties
-                    Vector3 hitPoint = ray.PointAtParameter(closest);
+                    Vector3 hitPoint = ray.PointAtParameter(dist);
                     Vector3 normal = hitObject.NormalAt(hitPoint, ray);
 
                     //index of refraction
                     float ior = 1.5f; // Replace with the refractive index of the material
-
-                    // Fresnel reflection coefficient
-                    float reflectionCoefficient = 0f;
-                    if (hitObject.Fresnel > 0)
-                        reflectionCoefficient = FresnelReflection(ray.Direction, normal, ior) * hitObject.Fresnel;
-                    reflectionCoefficient += hitObject.Reflectivity;
-                    reflectionCoefficient = Math.Clamp(reflectionCoefficient, 0, 1);
-
-                    //Bounce ray
-                    Ray bouncedRay = ray.Bounce(hitPoint, normal);
-
-                    // Trace the bounced ray
-                    int bounceColour = Trace(bouncedRay, objects, depth + 1);
+                    float reflectionCoefficient = ReflectionCoEfficient(ray, hitObject, normal, ior);
 
                     // Calculate the diffuse colour
                     int diffuseColour = GetDiffuseColour(hitObject, objects, hitPoint, normal);
+                    colorArray[depth] = diffuseColour;  //Write down current diffuse colour
+                    mixtureAmount[depth] = reflectionCoefficient;
 
-                    // Mix the colours
-                    int mixedColour = Ext.MixColors(bounceColour, diffuseColour, reflectionCoefficient);
-
-                    // Return mixed colour
-                    return mixedColour;
+                    if (depth < MAX_DEPTH)
+                    {
+                        Ray nextRay = ray.Bounce(hitPoint, normal);
+                        ray = nextRay;
+                    }
+                    else
+                    {
+                        // Get color when reaching max depth
+                        var red = (int)(hitObject.Color.R);
+                        var green = (int)(hitObject.Color.G);
+                        var blue = (int)(hitObject.Color.B);
+                        var directColor = Ext.RGBToColorInt(red, green, blue);
+                        colorArray[depth + 1] = directColor;
+                    }
                 }
                 else
                 {
-                    // Get color when reaching max depth
-                    var red = (int)(hitObject.Color.R);
-                    var green = (int)(hitObject.Color.G);
-                    var blue = (int)(hitObject.Color.B);
-                    var directColor = Ext.RGBToColorInt(red, green, blue);
-
-                    // Return direct color
-                    return directColor;
+                    // Return black if no hit
+                    colorArray[depth] = Ext.RGBToColorInt(120, 150, 180);
+                    mixtureAmount[depth] = 0;
+                    break;
                 }
             }
 
-            // Return black if no hit
-            return Ext.RGBToColorInt(120, 150, 180);
+            // Start with the last color
+            int resultColor = colorArray[colorArray.Count() - 1];
+
+            // Work our way to the start
+            for (int i = colorArray.Count() - 2; i >= 0; i--)
+            {
+                resultColor = Ext.MixColors(resultColor, colorArray[i], mixtureAmount[i]);
+            }
+
+            //Mix
+            //int mixedColour = Ext.MixColors(bounceColour, diffuseColour, reflectionCoefficient);
+            return resultColor;
         }
 
         /// <summary>
