@@ -35,13 +35,16 @@ namespace TestWritable
             Compile();
             Compute();
         }
-
         public static void RendererKernel(Index1D pixelIndex, 
                            int _width, 
                            int _height, 
                            ArrayView<float> structData, 
                            ArrayView<int> output)
         {
+            //Create arrays for storing colors
+            float[] colorArray = new float[10];
+            float[] mixtureArray = new float[10];
+
             //Pixel indices
             int img_x = pixelIndex % _width;
             int img_y = pixelIndex / _width;
