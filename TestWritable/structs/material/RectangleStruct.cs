@@ -141,40 +141,39 @@ namespace TestWritable.structs.material
         {
             var rectangle = new RectangleStruct
             {
-
                 Center = new Vector3
+                {
+                    X = arr[readFrom + 0],
+                    Y = arr[readFrom + 1],
+                    Z = arr[readFrom + 2]
+                },
+
+                Normal = new Vector3
+                {
+                    X = arr[readFrom + 3],
+                    Y = arr[readFrom + 4],
+                    Z = arr[readFrom + 5]
+                },
+
+                Min = new Vector3
                 {
                     X = arr[readFrom + 6],
                     Y = arr[readFrom + 7],
                     Z = arr[readFrom + 8]
                 },
 
-                Normal = new Vector3
+                Max = new Vector3
                 {
                     X = arr[readFrom + 9],
                     Y = arr[readFrom + 10],
                     Z = arr[readFrom + 11]
                 },
 
-                Min = new Vector3
-                {
-                    X = arr[readFrom + 12],
-                    Y = arr[readFrom + 13],
-                    Z = arr[readFrom + 14]
-                },
+                Color = ColorStruct.FromRGB((int)arr[readFrom + 12], (int)arr[readFrom + 13], (int)arr[readFrom + 14]),
 
-                Max = new Vector3
-                {
-                    X = arr[readFrom + 15],
-                    Y = arr[readFrom + 16],
-                    Z = arr[readFrom + 17]
-                },
-
-                Color = ColorStruct.FromRGB((int)arr[readFrom + 18], (int)arr[readFrom + 19], (int)arr[readFrom + 20]),
-
-                Luminance = arr[readFrom + 21],
-                Reflectivity = arr[readFrom + 22],
-                Fresnel = arr[readFrom + 23]
+                Luminance = arr[readFrom + 15],
+                Reflectivity = arr[readFrom + 16],
+                Fresnel = arr[readFrom + 17]
             };
 
             return rectangle;
