@@ -64,7 +64,7 @@ namespace TestWritable
             var ray = new RayStruct(Origin, Vector3.Normalize(direction));
 
             // Get color
-            int color_data = FresnelTracer.Trace(ray, structData);
+            int color_data = GlassTracer.Trace(ray, structData);
 
             //Set output
             output[pixelIndex] = color_data;

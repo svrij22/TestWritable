@@ -78,6 +78,43 @@ namespace TestWritable.engine
                     float ior = 1.5f; // Replace with the refractive index of the material
                     float reflectionCoefficient = ReflectionCoEfficient(ray, hitObject, normal, ior);
 
+
+                    // For glass materials
+                    if (hitObject.IsGlass())
+                    {
+
+                        Vector3 outwardNormal;
+                        Vector3 reflected = Vector3.Reflect(ray.Direction, hitObject.NormalAt(hitPoint, ray));
+                        float ni_over_nt;
+                        float reflectProb;
+                        Vector3 refracted;
+                        if (Vector3.Dot(ray.Direction, normal) > 0)
+                        {
+                            outwardNormal = -normal;
+                            ni_over_nt = ior;  // ior is the refractive index for the material
+                            reflectProb = FresnelReflection(ray.Direction, normal, ior);
+                        }
+                        else
+                        {
+                            outwardNormal = normal;
+                            ni_over_nt = 1.0f / ior;
+                            reflectProb = FresnelReflection(ray.Direction, -normal, ior);
+                        }
+                        static float Lerp(float a, float b, float t)
+                        {
+                            return (1 - t) * a + t * b;
+                        }
+                        reflectProb = Lerp(reflectProb, 0.5f, 0.1f);
+
+                        //Calculate refraction
+                        Refract(ray.Direction, outwardNormal, ni_over_nt, out refracted);
+                        RayStruct refractedRay = new RayStruct(hitPoint, refracted);
+                        ray = refractedRay;
+                        colorArray[depth] = 0xFFFFFF;
+                        mixtureAmount[depth] = 1;
+                        continue;
+                    }
+
                     // Calculate the diffuse colour
                     int diffuseColour = GetDiffuseColour(hitObject, structData, hitPoint, normal);
                     colorArray[depth] = diffuseColour;  //Write down current diffuse colour
