@@ -250,11 +250,11 @@ namespace TestWritable.engine
                     for (int i2 = 0; i2 < numSoftShadowRays; i2++)
                     {
                         //Generate random 
-                        double rand1 = RandomExt.GetRandom(randData, (doublePointer * 8));
+                        double rand1 = RandomExt.GetRandom(randData, (doublePointer * 32));
                         doublePointer++;
 
                         //Generate random 
-                        double rand2 = RandomExt.GetRandom(randData, (doublePointer * 8));
+                        double rand2 = RandomExt.GetRandom(randData, (doublePointer * 32));
                         doublePointer++;
 
                         //Point to random object on light

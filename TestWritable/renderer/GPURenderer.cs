@@ -109,8 +109,8 @@ namespace TestWritable
 
             //Write random doubles
             Random random = new Random();
-            double[] rnd = new double[4096];
-            for (int i = 0; i < 4096; i++)
+            double[] rnd = new double[40960];
+            for (int i = 0; i < 40960; i++)
                 rnd[i] = random.NextDouble();
             randData = accelerator.Allocate1D<double>(rnd.ToArray());
 
