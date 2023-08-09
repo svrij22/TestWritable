@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ILGPU;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -10,9 +11,6 @@ namespace TestWritable.structs.material
 {
     public struct RectangleStruct // If TracerObject is a class, remove the inheritance here.
     {
-        public Vector3 Pos1;
-        public Vector3 Pos2;
-
         public Vector3 Center;
         public Vector3 Normal;
 
@@ -34,9 +32,6 @@ namespace TestWritable.structs.material
                                float reflectivity = 0f, 
                                float fresnel = 0f)
         {
-            this.Pos1 = pos1;
-            this.Pos2 = pos2;
-
             this.Normal = Vector3.Normalize(Vector3.Cross(pos2 - pos1, new Vector3(0, 1, 0)));
 
             this.Center = (pos1 + pos2) / 2;
@@ -46,14 +41,14 @@ namespace TestWritable.structs.material
             this.Fresnel = fresnel;
 
             Min = new Vector3(
-                Math.Min(Pos1.X, Pos2.X),
-                Math.Min(Pos1.Y, Pos2.Y),
-                Math.Min(Pos1.Z, Pos2.Z)
+                Math.Min(pos1.X, pos2.X),
+                Math.Min(pos1.Y, pos2.Y),
+                Math.Min(pos1.Z, pos2.Z)
             );
             Max = new Vector3(
-                Math.Max(Pos1.X, Pos2.X),
-                Math.Max(Pos1.Y, Pos2.Y),
-                Math.Max(Pos1.Z, Pos2.Z)
+                Math.Max(pos1.X, pos2.X),
+                Math.Max(pos1.Y, pos2.Y),
+                Math.Max(pos1.Z, pos2.Z)
             );
         }
 
@@ -85,6 +80,7 @@ namespace TestWritable.structs.material
                     hitPoint.Y = (float)Math.Round(hitPoint.Y, 3);
                     hitPoint.Z = (float)Math.Round(hitPoint.Z, 3);
 
+                    // Use precomputed Min and Max for hit detection
                     if (hitPoint.X >= Min.X && hitPoint.X <= Max.X &&
                         hitPoint.Y >= Min.Y && hitPoint.Y <= Max.Y &&
                         hitPoint.Z >= Min.Z && hitPoint.Z <= Max.Z)
@@ -96,6 +92,92 @@ namespace TestWritable.structs.material
 
             t = 0;
             return false;
+        }
+
+        /// <summary>
+        /// Convert to FloatArray
+        /// </summary>
+        /// <returns></returns>
+        public float[] Encode()
+        {
+            return new float[]
+            {
+            Center.X,
+            Center.Y,
+            Center.Z,
+
+            Normal.X,
+            Normal.Y,
+            Normal.Z,
+
+            Min.X,
+            Min.Y,
+            Min.Z,
+
+            Max.X,
+            Max.Y,
+            Max.Z,
+
+            Color.R,
+            Color.G,
+            Color.B,
+
+            Luminance,
+            Reflectivity,
+            Fresnel,
+
+            -123123123 // use -123123123 as end key
+            };
+        }
+
+
+        /// <summary>
+        /// Convert back to RectangleStruct
+        /// </summary>
+        /// <param name="arr"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static RectangleStruct Decode(ArrayView<float> arr, int readFrom)
+        {
+            var rectangle = new RectangleStruct
+            {
+
+                Center = new Vector3
+                {
+                    X = arr[readFrom + 6],
+                    Y = arr[readFrom + 7],
+                    Z = arr[readFrom + 8]
+                },
+
+                Normal = new Vector3
+                {
+                    X = arr[readFrom + 9],
+                    Y = arr[readFrom + 10],
+                    Z = arr[readFrom + 11]
+                },
+
+                Min = new Vector3
+                {
+                    X = arr[readFrom + 12],
+                    Y = arr[readFrom + 13],
+                    Z = arr[readFrom + 14]
+                },
+
+                Max = new Vector3
+                {
+                    X = arr[readFrom + 15],
+                    Y = arr[readFrom + 16],
+                    Z = arr[readFrom + 17]
+                },
+
+                Color = ColorStruct.FromRGB((int)arr[readFrom + 18], (int)arr[readFrom + 19], (int)arr[readFrom + 20]),
+
+                Luminance = arr[readFrom + 21],
+                Reflectivity = arr[readFrom + 22],
+                Fresnel = arr[readFrom + 23]
+            };
+
+            return rectangle;
         }
     }
 }

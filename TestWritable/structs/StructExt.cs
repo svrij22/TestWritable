@@ -12,7 +12,8 @@ namespace TestWritable.structs
         public enum StructType
         {
             Sphere,
-            Plane
+            Plane,
+            Rectangle
         }
 
         // Count the number of objects (determined by the number of -123123123 values)
